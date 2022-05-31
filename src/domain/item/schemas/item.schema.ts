@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type ItemDocument = Item & Document;
@@ -15,6 +15,9 @@ const Time: Time = {
 
 @Schema()
 export class Item {
+  @Prop({ required: true })
+  id: Types.ObjectId;
+
   @Prop({ required: true })
   name: string;
 

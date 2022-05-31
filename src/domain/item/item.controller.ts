@@ -7,9 +7,9 @@ import { Jwt } from '../../decorators/jwt.decorator';
 @Controller('item')
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
+
   @Post()
   create(@Body() item: ItemDto, @Jwt('id') id: string) {
-    console.log(id);
     const data = this.itemService.create(item, id);
     return {
       statusCode: HttpStatus.CREATED,
