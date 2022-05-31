@@ -16,8 +16,7 @@ export class ItemService {
       id: new Types.ObjectId().toHexString(),
       ...item,
     });
-    await user.save();
-    return user;
+    return await user.save();
   }
 
   async update(item: UpdateItemDto, id: string) {
@@ -30,7 +29,6 @@ export class ItemService {
       ...user.items[itemIndex],
       ...item,
     };
-    await user.save();
-    return user;
+    return await user.save();
   }
 }

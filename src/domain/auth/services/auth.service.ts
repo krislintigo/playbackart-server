@@ -18,7 +18,7 @@ export class AuthService {
   ) {}
 
   async register({ login, password }: UserDto): Promise<UserDocument> {
-    const isAlreadyExist = await this.userModel.findOne({ login });
+    const isAlreadyExist = await this.userModel.findOne({ login }, 'login');
     if (isAlreadyExist) {
       throw new BadRequestException(answers.error.user.alreadyExists);
     }
@@ -28,7 +28,8 @@ export class AuthService {
   }
 
   async login({ login, password }: UserDto): Promise<UserDocument> {
-    const user = await this.userModel.findOne({ login });
+    const user = await this.userModel.findOne({ login }, 'login password');
+    console.log(user);
     if (!user) {
       throw new BadRequestException(answers.error.user.notFound);
     }
