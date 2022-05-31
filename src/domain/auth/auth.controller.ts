@@ -50,14 +50,12 @@ export class AuthController {
   async validate(@Req() request: Request) {
     try {
       const data = await this.jwtService.verify(request.cookies?.jwt);
-      console.log(data);
       return {
         statusCode: HttpStatus.OK,
         message: answers.success.user.login,
         data,
       };
     } catch (error) {
-      console.log(error.message);
       return {
         statusCode: HttpStatus.UNAUTHORIZED,
         message: answers.error.user.invalidToken,
@@ -66,9 +64,9 @@ export class AuthController {
   }
 
   @Get('logout')
-  async logout(@Res() res: Response) {
-    res.cookie('jwt', '');
-    res.send({
+  async logout(@Res() response: Response) {
+    response.cookie('jwt', '');
+    response.send({
       statusCode: HttpStatus.OK,
       message: answers.success.user.logout,
     });

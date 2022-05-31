@@ -11,8 +11,8 @@ import { serverConfig } from '../../server.config';
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.register({
-      secret: serverConfig.jwt.secret || 'secret',
-      signOptions: { expiresIn: serverConfig.jwt.expiresIn || '1d' },
+      secret: serverConfig.jwt.secret,
+      signOptions: { expiresIn: serverConfig.jwt.expiresIn },
     }),
   ],
   controllers: [AuthController],
