@@ -8,12 +8,17 @@ export type Time = {
   duration: number;
 };
 
+const Time: Time = {
+  count: 0,
+  duration: 0,
+};
+
 @Schema()
 export class Item {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
+  @Prop()
   image: string;
 
   @Prop()
@@ -31,7 +36,7 @@ export class Item {
   @Prop()
   genres: string[];
 
-  @Prop()
+  @Prop({ type: [Time] })
   time: Time;
 }
 
