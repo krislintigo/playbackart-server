@@ -25,4 +25,25 @@ export class AuthService {
     const createdUser = new this.userModel({ login, password: hashedPassword });
     return await createdUser.save();
   }
+
+  async login({ login, password }: UserDto): Promise<UserDocument> {
+    const user = await this.userModel.findOne({ login });
+    if (!user) {
+      throw new HttpException(
+        answers.error.user.notFound,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const isPasswordValid = await this.passwordService.comparePasswords(
+      password,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new HttpException(
+        answers.error.user.badCredentials,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return user;
+  }
 }
