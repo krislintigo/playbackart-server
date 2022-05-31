@@ -1,8 +1,7 @@
 import {
   createParamDecorator,
   ExecutionContext,
-  HttpException,
-  HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { serverConfig } from '../server.config';
 import { answers } from '../constants/answers';
@@ -17,14 +16,9 @@ export const Jwt = createParamDecorator(
       const userData = jwtService.verify(token, {
         secret: serverConfig.jwt.secret,
       });
-      console.log('data from decorator', userData);
       return field ? userData[field] : { id: userData.id };
     } catch (error) {
-      console.log(error.message);
-      throw new HttpException(
-        answers.error.user.invalidToken,
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new UnauthorizedException(answers.error.user.invalidToken);
     }
   },
 );

@@ -1,17 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpStatus,
-  Post,
-  Req,
-  Res,
-} from '@nestjs/common';
-import { Response, Request } from 'express';
+import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './services/auth.service';
 import { UserDto } from './dtos/user.dto';
 import { answers, answerType } from '../../constants/answers';
+import { Jwt } from '../../decorators/jwt.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -54,20 +47,12 @@ export class AuthController {
   }
 
   @Get('validate')
-  async validate(@Req() request: Request): Promise<answerType> {
-    try {
-      const data = await this.jwtService.verify(request.cookies?.jwt);
-      return {
-        statusCode: HttpStatus.OK,
-        message: answers.success.user.login,
-        data,
-      };
-    } catch (error) {
-      return {
-        statusCode: HttpStatus.UNAUTHORIZED,
-        message: answers.error.user.invalidToken,
-      };
-    }
+  async validate(@Jwt() data: object): Promise<answerType> {
+    return {
+      statusCode: HttpStatus.OK,
+      message: answers.success.user.login,
+      data,
+    };
   }
 
   @Get('logout')
