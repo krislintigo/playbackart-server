@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../auth/schemas/user.schema';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { ItemDto } from '../dtos/item.dto';
 import { UpdateItemDto } from '../dtos/update-item.dto';
 import { answers } from '../../../constants/answers';
@@ -10,13 +10,9 @@ import { answers } from '../../../constants/answers';
 export class ItemService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async create(item: ItemDto, id: string) {
-    const user = await this.userModel.findById(id);
-    user.items.push({
-      id: new Types.ObjectId().toHexString(),
-      ...item,
-    });
-    return await user.save();
+  async create(item: ItemDto, id: string): Promise<ItemDto> {
+    this.userModel.updateOne({ _id: id }, { $push: { items: { ...item } } });
+    return item;
   }
 
   async findAll(userID: string) {
@@ -26,7 +22,7 @@ export class ItemService {
 
   async findByType(userID: string, type: string) {
     const user = await this.userModel.findById(userID);
-    return user.items.filter((i) => i.type === type);
+    return user.items.filter((item) => item.type === type);
   }
 
   async findOne(userID: string, itemID: string) {
