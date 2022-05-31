@@ -19,6 +19,36 @@ export class ItemService {
     return await user.save();
   }
 
+  async findAll(userID: string) {
+    const user = await this.userModel.findById(userID);
+    return user.items;
+  }
+
+  async findByType(userID: string, type: string) {
+    // is it working?
+    const user = await this.userModel.findOne(
+      { _id: userID },
+      {
+        items: { $elemMatch: { type } },
+      },
+    );
+    console.log(user);
+    return user;
+  }
+
+  async findOne(userID: string, itemID: string) {
+    const user = await this.userModel.findOne(
+      { _id: userID },
+      {
+        items: { $elemMatch: { id: itemID } },
+      },
+    );
+    if (!user.items[0]) {
+      throw new NotFoundException(answers.error.item.notFound);
+    }
+    return user.items[0];
+  }
+
   async update(item: UpdateItemDto, id: string) {
     const user = await this.userModel.findById(id);
     const itemIndex = user.items.findIndex((i) => i.id === item.id);
