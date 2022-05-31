@@ -13,6 +13,6 @@ async function bootstrap() {
   });
   app.setGlobalPrefix('api');
   await app.listen(serverConfig.port);
-  console.log(`Server running on http://localhost:${serverConfig.port}`);
+  console.log(`Server running on port ${serverConfig.port}`);
 }
 bootstrap();
