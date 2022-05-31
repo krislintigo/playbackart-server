@@ -11,9 +11,9 @@ import { Item } from '../schemas/item.schema';
 export class ItemService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async create(item: ItemDto, id: string): Promise<ItemDto> {
+  async create(item: ItemDto, userID: string): Promise<ItemDto> {
     await this.userModel.updateOne(
-      { _id: id },
+      { _id: userID },
       { $push: { items: { ...item, id: new Types.ObjectId().toHexString() } } },
     );
     return item;
@@ -42,11 +42,15 @@ export class ItemService {
     return user.items[0];
   }
 
-  async update(item: UpdateItemDto, id: string) {
-    const oldItem = await this.findOne(id, item.id);
+  async update(
+    item: UpdateItemDto,
+    userID: string,
+    itemID: string,
+  ): Promise<Item> {
+    const oldItem = await this.findOne(userID, itemID);
     const newItem = { ...oldItem, ...item };
     await this.userModel.updateOne(
-      { _id: id, 'items.id': item.id },
+      { _id: userID, 'items.id': itemID },
       { $set: { 'items.$': { ...newItem } } },
     );
     return newItem;

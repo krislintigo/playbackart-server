@@ -67,12 +67,13 @@ export class ItemController {
     };
   }
 
-  @Put()
+  @Put(':id')
   async update(
+    @Param('id') itemId: string,
     @Body() item: UpdateItemDto,
-    @Jwt('id') id: string,
+    @Jwt('id') userId: string,
   ): Promise<answerType> {
-    const data = await this.itemService.update(item, id);
+    const data = await this.itemService.update(item, userId, itemId);
     return {
       statusCode: HttpStatus.OK,
       message: answers.success.item.updated,
