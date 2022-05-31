@@ -25,15 +25,8 @@ export class ItemService {
   }
 
   async findByType(userID: string, type: string) {
-    // is it working?
-    const user = await this.userModel.findOne(
-      { _id: userID },
-      {
-        items: { $elemMatch: { type } },
-      },
-    );
-    console.log(user);
-    return user;
+    const user = await this.userModel.findById(userID);
+    return user.items.filter((i) => i.type === type);
   }
 
   async findOne(userID: string, itemID: string) {
