@@ -2,11 +2,12 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumber,
-  IsObject,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
-import { Time } from '../schemas/item.schema';
+import { TimeDto } from './time.dto';
+import { Type } from 'class-transformer';
 
 export class ItemDto {
   @IsNotEmpty()
@@ -38,6 +39,7 @@ export class ItemDto {
   genres: string[];
 
   @IsOptional()
-  @IsObject()
-  time: Time;
+  @Type(() => TimeDto)
+  @ValidateNested()
+  time: TimeDto;
 }
