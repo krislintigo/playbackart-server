@@ -22,11 +22,12 @@ export class AuthController {
     response.cookie('jwt', this.jwtService.sign({ id: data.id }), {
       httpOnly: true,
     });
-    return {
+    response.send({
       statusCode: HttpStatus.CREATED,
       message: answers.success.user.created,
       data,
-    };
+    });
+    return;
   }
 
   @Post('login')
