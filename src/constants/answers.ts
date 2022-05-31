@@ -23,3 +23,10 @@ export const answers = {
     },
   },
 };
+
+export type answerType = {
+  statusCode: number;
+  message: string | Array<string>;
+  error?: string;
+  data?: any;
+};

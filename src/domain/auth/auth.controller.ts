@@ -11,7 +11,7 @@ import { Response, Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './services/auth.service';
 import { UserDto } from './dtos/user.dto';
-import { answers } from '../../constants/answers';
+import { answers, answerType } from '../../constants/answers';
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +21,10 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  async register(@Body() user: UserDto, @Res() response: Response) {
+  async register(
+    @Body() user: UserDto,
+    @Res() response: Response,
+  ): Promise<answerType> {
     const data = await this.authService.register(user);
     response.cookie('jwt', this.jwtService.sign({ id: data.id }), {
       httpOnly: true,
@@ -34,7 +37,10 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() user: UserDto, @Res() response: Response) {
+  async login(
+    @Body() user: UserDto,
+    @Res() response: Response,
+  ): Promise<answerType> {
     const data = await this.authService.login(user);
     response.cookie('jwt', this.jwtService.sign({ id: data.id }), {
       httpOnly: true,
@@ -44,10 +50,11 @@ export class AuthController {
       message: answers.success.user.login,
       data,
     });
+    return;
   }
 
   @Get('validate')
-  async validate(@Req() request: Request) {
+  async validate(@Req() request: Request): Promise<answerType> {
     try {
       const data = await this.jwtService.verify(request.cookies?.jwt);
       return {
@@ -64,11 +71,12 @@ export class AuthController {
   }
 
   @Get('logout')
-  async logout(@Res() response: Response) {
+  async logout(@Res() response: Response): Promise<answerType> {
     response.cookie('jwt', '');
     response.send({
       statusCode: HttpStatus.OK,
       message: answers.success.user.logout,
     });
+    return;
   }
 }
