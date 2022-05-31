@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsNotEmpty,
   IsNumber,
   IsObject,
   IsOptional,
@@ -8,6 +9,10 @@ import {
 import { Time } from '../schemas/item.schema';
 
 export class UpdateItemDto {
+  @IsNotEmpty()
+  @IsString()
+  id: string;
+
   @IsOptional()
   @IsString()
   name?: string;

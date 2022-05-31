@@ -1,4 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  UnauthorizedException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
 import { Model } from 'mongoose';
@@ -16,10 +20,7 @@ export class AuthService {
   async register({ login, password }: UserDto): Promise<UserDocument> {
     const isAlreadyExist = await this.userModel.findOne({ login });
     if (isAlreadyExist) {
-      throw new HttpException(
-        answers.error.user.alreadyExists,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException(answers.error.user.alreadyExists);
     }
     const hashedPassword = await this.passwordService.hashPassword(password);
     const createdUser = new this.userModel({ login, password: hashedPassword });
@@ -29,20 +30,14 @@ export class AuthService {
   async login({ login, password }: UserDto): Promise<UserDocument> {
     const user = await this.userModel.findOne({ login });
     if (!user) {
-      throw new HttpException(
-        answers.error.user.notFound,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException(answers.error.user.notFound);
     }
     const isPasswordValid = await this.passwordService.comparePasswords(
       user.password,
       password,
     );
     if (!isPasswordValid) {
-      throw new HttpException(
-        answers.error.user.badCredentials,
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new UnauthorizedException(answers.error.user.badCredentials);
     }
     return user;
   }

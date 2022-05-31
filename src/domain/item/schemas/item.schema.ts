@@ -16,7 +16,7 @@ const Time: Time = {
 @Schema()
 export class Item {
   @Prop({ required: true })
-  id: Types.ObjectId;
+  id: string;
 
   @Prop({ required: true })
   name: string;
