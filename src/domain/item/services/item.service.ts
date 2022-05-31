@@ -43,11 +43,12 @@ export class ItemService {
   }
 
   async update(item: UpdateItemDto, id: string) {
-    const updatedItem = await this.findOne(id, item.id);
+    const oldItem = await this.findOne(id, item.id);
+    const newItem = { ...oldItem, ...item };
     await this.userModel.updateOne(
       { _id: id, 'items.id': item.id },
-      { $set: { 'items.$': { ...updatedItem, ...item } } },
+      { $set: { 'items.$': { ...newItem } } },
     );
-    return { ...updatedItem, ...item };
+    return newItem;
   }
 }
