@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsObject,
+  IsOptional,
   IsString,
 } from 'class-validator';
 import { Time } from '../schemas/item.schema';
@@ -12,9 +13,11 @@ export class ItemDto {
   @IsString()
   name!: string;
 
+  @IsOptional()
   @IsString()
   image: string;
 
+  @IsOptional()
   @IsNumber()
   rating: number;
 
@@ -26,12 +29,15 @@ export class ItemDto {
   @IsString()
   type!: string;
 
+  @IsOptional()
   @IsString()
   restriction: string;
 
+  @IsOptional()
   @IsArray()
   genres: string[];
 
+  @IsOptional()
   @IsObject()
   time: Time;
 }
