@@ -5,7 +5,7 @@ export const serverConfig = {
     link: `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_NAME}.${process.env.DB_CLUSTER_URL}/?retryWrites=true&w=majority`,
   },
   jwt: {
-    secret: process.env.JWT_SECRET || 'secret',
-    expiresIn: process.env.JWT_EXPIRES_IN || '1d',
+    secret: process.env.JWT_SECRET,
+    expiresIn: process.env.JWT_EXPIRES_IN,
   },
 };
