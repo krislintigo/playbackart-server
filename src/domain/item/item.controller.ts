@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -76,6 +77,18 @@ export class ItemController {
       statusCode: HttpStatus.OK,
       message: answers.success.item.updated,
       data,
+    };
+  }
+
+  @Delete(':id')
+  async delete(
+    @Param('id') itemId: string,
+    @Jwt('id') id: string,
+  ): Promise<answerType> {
+    await this.itemService.delete(id, itemId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: answers.success.item.deleted,
     };
   }
 }

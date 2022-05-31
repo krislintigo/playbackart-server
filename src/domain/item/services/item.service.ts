@@ -51,4 +51,12 @@ export class ItemService {
     );
     return newItem;
   }
+
+  async delete(userID: string, itemID: string) {
+    await this.findOne(userID, itemID);
+    await this.userModel.updateOne(
+      { _id: userID },
+      { $pull: { items: { id: itemID } } },
+    );
+  }
 }
