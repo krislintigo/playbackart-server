@@ -35,13 +35,13 @@ export class AuthService {
       );
     }
     const isPasswordValid = await this.passwordService.comparePasswords(
-      password,
       user.password,
+      password,
     );
     if (!isPasswordValid) {
       throw new HttpException(
         answers.error.user.badCredentials,
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.UNAUTHORIZED,
       );
     }
     return user;
