@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  ParseArrayPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -21,9 +22,9 @@ export class ItemController {
   @Post()
   async create(
     @Body() item: ItemDto,
-    @Jwt('id') id: string,
+    @Jwt('id') userID: string,
   ): Promise<answerType> {
-    const data = await this.itemService.create(item, id);
+    const data = await this.itemService.create(item, userID);
     return {
       statusCode: HttpStatus.CREATED,
       message: answers.success.item.created,
@@ -32,8 +33,8 @@ export class ItemController {
   }
 
   @Get()
-  async findAll(@Jwt('id') id: string): Promise<answerType> {
-    const data = await this.itemService.findAll(id);
+  async findAll(@Jwt('id') userID: string): Promise<answerType> {
+    const data = await this.itemService.findAll(userID);
     return {
       statusCode: HttpStatus.OK,
       message: answers.success.item.getAll,
@@ -44,9 +45,9 @@ export class ItemController {
   @Get('types/:type')
   async findByType(
     @Param('type') type: string,
-    @Jwt('id') id: string,
+    @Jwt('id') userID: string,
   ): Promise<answerType> {
-    const data = await this.itemService.findByType(id, type);
+    const data = await this.itemService.findByType(userID, type);
     return {
       statusCode: HttpStatus.OK,
       message: answers.success.item.getByType,
@@ -56,10 +57,10 @@ export class ItemController {
 
   @Get(':id')
   async findOne(
-    @Param('id') itemId: string,
-    @Jwt('id') id: string,
+    @Param('id') itemID: string,
+    @Jwt('id') userID: string,
   ): Promise<answerType> {
-    const data = await this.itemService.findOne(id, itemId);
+    const data = await this.itemService.findOne(userID, itemID);
     return {
       statusCode: HttpStatus.OK,
       message: answers.success.item.getOne,
@@ -69,11 +70,11 @@ export class ItemController {
 
   @Put(':id')
   async update(
-    @Param('id') itemId: string,
+    @Param('id') itemID: string,
     @Body() item: UpdateItemDto,
-    @Jwt('id') userId: string,
+    @Jwt('id') userID: string,
   ): Promise<answerType> {
-    const data = await this.itemService.update(item, userId, itemId);
+    const data = await this.itemService.update(item, userID, itemID);
     return {
       statusCode: HttpStatus.OK,
       message: answers.success.item.updated,
@@ -83,13 +84,26 @@ export class ItemController {
 
   @Delete(':id')
   async delete(
-    @Param('id') itemId: string,
-    @Jwt('id') id: string,
+    @Param('id') itemID: string,
+    @Jwt('id') userID: string,
   ): Promise<answerType> {
-    await this.itemService.delete(id, itemId);
+    await this.itemService.delete(userID, itemID);
     return {
       statusCode: HttpStatus.OK,
       message: answers.success.item.deleted,
+    };
+  }
+
+  @Post('load')
+  async load(
+    @Body(new ParseArrayPipe({ items: ItemDto })) items: ItemDto[],
+    @Jwt('id') userID: string,
+  ): Promise<answerType> {
+    const data = await this.itemService.load(userID, items);
+    return {
+      statusCode: HttpStatus.OK,
+      message: answers.success.item.loaded,
+      data,
     };
   }
 }

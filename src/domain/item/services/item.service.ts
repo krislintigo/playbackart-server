@@ -12,11 +12,12 @@ export class ItemService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async create(item: ItemDto, userID: string): Promise<ItemDto> {
+    const newItem = { id: new Types.ObjectId().toHexString(), ...item };
     await this.userModel.updateOne(
       { _id: userID },
-      { $push: { items: { ...item, id: new Types.ObjectId().toHexString() } } },
+      { $push: { items: newItem } },
     );
-    return item;
+    return newItem;
   }
 
   async findAll(userID: string): Promise<Item[]> {
@@ -32,9 +33,7 @@ export class ItemService {
   async findOne(userID: string, itemID: string): Promise<Item> {
     const user = await this.userModel.findOne(
       { _id: userID },
-      {
-        items: { $elemMatch: { id: itemID } },
-      },
+      { items: { $elemMatch: { id: itemID } } },
     );
     if (!user.items[0]) {
       throw new NotFoundException(answers.error.item.notFound);
@@ -62,5 +61,14 @@ export class ItemService {
       { _id: userID },
       { $pull: { items: { id: itemID } } },
     );
+  }
+
+  async load(userID: string, data: ItemDto[]): Promise<ItemDto[]> {
+    const items = data.map((i) => ({
+      id: new Types.ObjectId().toHexString(),
+      ...i,
+    }));
+    await this.userModel.updateOne({ _id: userID }, { $set: { items } });
+    return data;
   }
 }
