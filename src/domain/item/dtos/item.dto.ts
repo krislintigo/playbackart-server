@@ -49,6 +49,6 @@ export class ItemDto {
   year: string;
 
   @IsOptional()
-  @IsString()
-  developer: string;
+  @IsString({ each: true })
+  developer: string[];
 }
