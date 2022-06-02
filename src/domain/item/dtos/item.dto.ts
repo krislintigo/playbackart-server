@@ -36,10 +36,15 @@ export class ItemDto {
 
   @IsOptional()
   @IsArray()
+  @IsString({ each: true })
   genres: string[];
 
   @IsOptional()
   @Type(() => TimeDto)
   @ValidateNested()
   time: TimeDto;
+
+  @IsOptional()
+  @IsString()
+  year: string;
 }
