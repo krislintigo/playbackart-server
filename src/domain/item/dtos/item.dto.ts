@@ -50,5 +50,5 @@ export class ItemDto {
 
   @IsOptional()
   @IsString({ each: true })
-  developer: string[];
+  developers: string[];
 }
