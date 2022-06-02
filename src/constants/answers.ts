@@ -22,7 +22,7 @@ export const answers = {
       notFound: 'Пользователь не найден!',
       alreadyExists: 'Пользователь уже существует!',
       badCredentials: 'Неверный логин или пароль!',
-      invalidToken: 'Неверный токен!',
+      invalidToken: 'Требуется авторизация!',
     },
     item: {
       notFound: 'Элемент не найден!',
