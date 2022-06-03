@@ -40,13 +40,17 @@ export class UpdateItemDto {
   @IsOptional()
   @Type(() => TimeDto)
   @ValidateNested()
-  time: TimeDto;
+  time?: TimeDto;
 
   @IsOptional()
   @IsString()
-  year: string;
+  year?: string;
 
   @IsOptional()
   @IsString({ each: true })
-  developers: string[];
+  developers?: string[];
+
+  @IsOptional()
+  @IsString()
+  franchise?: string;
 }

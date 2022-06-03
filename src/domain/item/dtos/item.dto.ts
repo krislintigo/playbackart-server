@@ -47,4 +47,7 @@ export class ItemDto {
   @IsNotEmpty()
   @IsString({ each: true })
   developers: string[];
+
+  @IsString()
+  franchise: string;
 }
