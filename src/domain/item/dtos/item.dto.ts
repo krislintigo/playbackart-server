@@ -2,7 +2,6 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumber,
-  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -14,11 +13,10 @@ export class ItemDto {
   @IsString()
   name!: string;
 
-  @IsOptional()
   @IsString()
   image: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsNumber()
   rating: number;
 
@@ -30,25 +28,23 @@ export class ItemDto {
   @IsString()
   type!: string;
 
-  @IsOptional()
   @IsString()
   restriction: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsArray()
   @IsString({ each: true })
   genres: string[];
 
-  @IsOptional()
+  @IsNotEmpty()
   @Type(() => TimeDto)
   @ValidateNested()
   time: TimeDto;
 
-  @IsOptional()
   @IsString()
   year: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString({ each: true })
   developers: string[];
 }

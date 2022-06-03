@@ -41,4 +41,12 @@ export class UpdateItemDto {
   @Type(() => TimeDto)
   @ValidateNested()
   time: TimeDto;
+
+  @IsOptional()
+  @IsString()
+  year: string;
+
+  @IsOptional()
+  @IsString({ each: true })
+  developers: string[];
 }
