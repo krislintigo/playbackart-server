@@ -22,12 +22,14 @@ export class ItemService {
 
   async findAll(userID: string): Promise<Item[]> {
     const user = await this.userModel.findById(userID);
-    return user.items;
+    return user.items.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   async findByType(userID: string, type: string): Promise<Item[]> {
     const user = await this.userModel.findById(userID);
-    return user.items.filter((item) => item.type === type);
+    return user.items
+      .filter((item) => item.type === type)
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 
   async findOne(userID: string, itemID: string): Promise<Item> {
