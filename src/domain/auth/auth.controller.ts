@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
-import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './services/auth.service';
+import { JWTService } from './services/jwt.service';
 import { UserDto } from './dtos/user.dto';
 import { answers, answerType } from '../../constants/answers';
 import { Jwt } from '../../decorators/jwt.decorator';
@@ -10,7 +10,7 @@ import { Jwt } from '../../decorators/jwt.decorator';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly jwtService: JwtService,
+    private readonly jwtService: JWTService,
   ) {}
 
   @Post('register')
@@ -19,9 +19,7 @@ export class AuthController {
     @Res() response: Response,
   ): Promise<answerType> {
     const data = await this.authService.register(user);
-    response.cookie('jwt', this.jwtService.sign({ id: data.id }), {
-      httpOnly: true,
-    });
+    this.jwtService.signToken(response, { id: data.id });
     response.send({
       statusCode: HttpStatus.CREATED,
       message: answers.success.user.created,
@@ -36,9 +34,7 @@ export class AuthController {
     @Res() response: Response,
   ): Promise<answerType> {
     const data = await this.authService.login(user);
-    response.cookie('jwt', this.jwtService.sign({ id: data.id }), {
-      httpOnly: true,
-    });
+    this.jwtService.signToken(response, { id: data.id });
     response.send({
       statusCode: HttpStatus.OK,
       message: answers.success.user.login,
@@ -58,7 +54,7 @@ export class AuthController {
 
   @Get('logout')
   async logout(@Res() response: Response): Promise<answerType> {
-    response.cookie('jwt', '');
+    this.jwtService.resetToken(response);
     response.send({
       statusCode: HttpStatus.OK,
       message: answers.success.user.logout,
