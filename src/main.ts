@@ -13,7 +13,7 @@ async function bootstrap() {
     },
     bodyParser: true,
   });
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.use(cookieParser());
   app.setGlobalPrefix('api');
   await app.listen(serverConfig.port);

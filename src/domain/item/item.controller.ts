@@ -96,7 +96,8 @@ export class ItemController {
 
   @Post('load')
   async load(
-    @Body(new ParseArrayPipe({ items: ItemDto })) items: ItemDto[],
+    @Body(new ParseArrayPipe({ items: ItemDto, whitelist: true }))
+    items: ItemDto[],
     @Jwt('id') userID: string,
   ): Promise<answerType> {
     const data = await this.itemService.load(userID, items);
