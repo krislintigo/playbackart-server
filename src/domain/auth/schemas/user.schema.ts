@@ -14,6 +14,9 @@ export class User {
 
   @Prop({ default: [] })
   items: Item[];
+
+  @Prop({ required: true })
+  watching: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

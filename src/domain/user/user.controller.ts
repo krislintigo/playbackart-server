@@ -1,6 +1,8 @@
-import { Controller, Get, HttpStatus, Param } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Put } from '@nestjs/common';
 import UserService from './services/user.service';
 import { answers, answerType } from '../../constants/answers';
+import { Jwt } from '../../decorators/jwt.decorator';
+import { UpdateWatchingDto } from './dtos/update-watching.dto';
 
 @Controller('users')
 export class UserController {
@@ -32,6 +34,19 @@ export class UserController {
     return {
       statusCode: HttpStatus.OK,
       message: answers.success.user.getOne,
+      data,
+    };
+  }
+
+  @Put('/update-watching')
+  async updateWatching(
+    @Body() body: UpdateWatchingDto,
+    @Jwt('id') userID: string,
+  ): Promise<answerType> {
+    const data = await this.userService.updateWatching(userID, body.watching);
+    return {
+      statusCode: HttpStatus.OK,
+      message: answers.success.user.updateWatching,
       data,
     };
   }

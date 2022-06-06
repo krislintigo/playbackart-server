@@ -16,6 +16,15 @@ export default class UserService {
   }
 
   async findOneShort(id: string): Promise<UserDocument> {
-    return this.userModel.findById(id, 'id login');
+    return this.userModel.findById(id, 'id login watching');
+  }
+
+  async updateWatching(
+    userID: string,
+    watching: string,
+  ): Promise<UserDocument> {
+    return this.userModel.findByIdAndUpdate(userID, {
+      $set: { watching },
+    });
   }
 }

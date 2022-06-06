@@ -6,6 +6,7 @@ export const answers = {
       logout: 'Вы вышли из аккаунта!',
       getOne: 'Пользователь получен!',
       getAll: 'Пользователи получены!',
+      updateWatching: 'Список обновлен!',
     },
     item: {
       created: 'Элемент создан!',
