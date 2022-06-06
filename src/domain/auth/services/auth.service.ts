@@ -28,7 +28,10 @@ export class AuthService {
   }
 
   async login({ login, password }: UserDto): Promise<UserDocument> {
-    const user = await this.userModel.findOne({ login }, 'login password');
+    const user = await this.userModel.findOne(
+      { login },
+      'login password watching',
+    );
     if (!user) {
       throw new BadRequestException(answers.error.user.notFound);
     }

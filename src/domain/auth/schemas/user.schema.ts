@@ -15,7 +15,7 @@ export class User {
   @Prop({ default: [] })
   items: Item[];
 
-  @Prop({ required: true })
+  @Prop({ default: '' })
   watching: string;
 }
 
