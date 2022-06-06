@@ -68,6 +68,16 @@ export class ItemController {
     };
   }
 
+  @Get('for/:login')
+  async findByLogin(@Param('login') login: string): Promise<answerType> {
+    const data = await this.itemService.findByLogin(login);
+    return {
+      statusCode: HttpStatus.OK,
+      message: answers.success.item.getAll,
+      data,
+    };
+  }
+
   @Put(':id')
   async update(
     @Param('id') itemID: string,

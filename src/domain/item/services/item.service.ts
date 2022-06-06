@@ -43,6 +43,14 @@ export class ItemService {
     return user.items[0];
   }
 
+  async findByLogin(login: string): Promise<any> {
+    const user = await this.userModel.findOne({ login }, 'items');
+    if (!user) {
+      throw new NotFoundException(answers.error.user.notFound);
+    }
+    return user.items.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
   async update(
     item: UpdateItemDto,
     userID: string,
