@@ -70,10 +70,23 @@ export class ItemController {
 
   @Get('for/:login')
   async findByLogin(@Param('login') login: string): Promise<answerType> {
-    const data = await this.itemService.findByLogin(login);
+    const data = await this.itemService.findAllByLogin(login);
     return {
       statusCode: HttpStatus.OK,
       message: answers.success.item.getAll,
+      data,
+    };
+  }
+
+  @Get('for/:login/types/:type')
+  async findByLoginAndType(
+    @Param('login') login: string,
+    @Param('type') type: string,
+  ): Promise<answerType> {
+    const data = await this.itemService.findByLoginAndType(login, type);
+    return {
+      statusCode: HttpStatus.OK,
+      message: answers.success.item.getByType,
       data,
     };
   }

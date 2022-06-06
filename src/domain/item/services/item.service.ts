@@ -43,12 +43,22 @@ export class ItemService {
     return user.items[0];
   }
 
-  async findByLogin(login: string): Promise<any> {
+  async findAllByLogin(login: string): Promise<Item[]> {
     const user = await this.userModel.findOne({ login }, 'items');
     if (!user) {
       throw new NotFoundException(answers.error.user.notFound);
     }
     return user.items.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async findByLoginAndType(login: string, type: string): Promise<Item[]> {
+    const user = await this.userModel.findOne({ login }, 'items');
+    if (!user) {
+      throw new NotFoundException(answers.error.user.notFound);
+    }
+    return user.items
+      .filter((item) => item.type === type)
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 
   async update(
