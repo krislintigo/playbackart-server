@@ -117,13 +117,13 @@ export class ItemController {
     };
   }
 
-  @Post('load')
-  async load(
+  @Post('push')
+  async push(
     @Body(new ParseArrayPipe({ items: ItemDto, whitelist: true }))
     items: ItemDto[],
     @Jwt('id') userID: string,
   ): Promise<answerType> {
-    const data = await this.itemService.load(userID, items);
+    const data = await this.itemService.push(userID, items);
     return {
       statusCode: HttpStatus.OK,
       message: answers.success.item.loaded,

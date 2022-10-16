@@ -83,12 +83,12 @@ export class ItemService {
     );
   }
 
-  async load(userID: string, data: ItemDto[]): Promise<ItemDto[]> {
+  async push(userID: string, data: ItemDto[]): Promise<ItemDto[]> {
     const items = data.map((i) => ({
       id: new Types.ObjectId().toHexString(),
       ...i,
     }));
-    await this.userModel.updateOne({ _id: userID }, { $set: { items } });
+    await this.userModel.updateOne({ _id: userID }, { $push: { items } });
     return data;
   }
 }
