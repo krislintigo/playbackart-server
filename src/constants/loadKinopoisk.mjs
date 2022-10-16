@@ -1,5 +1,6 @@
 // https://api.kinopoisk.dev/movie?field=name&search=Алим%20и%20его%20ослик&field=year&search=1978&token=ZQQ8GMN-TN54SGK-NB3MKEC-ZKB8V06
 import fetch from "node-fetch";
+import fs from "fs";
 
 const items = `25-е, первый день, (1968)
 38 попугаев, (1976) 
@@ -12,35 +13,7 @@ const items = `25-е, первый день, (1968)
 38 Попугаев. Куда идет Слонёнок, (1977)
 38 попугаев. Ненаглядное пособие, (1991)
 38 Попугаев. Привет мартышке, (1978)
-Mister Пронька, (1991)
-А вот и я! («Фитиль» № 58), (1967)
-А что ты умеешь?, (1984)
-Аве Мария, (1972)
-Аврора, (1973)
-Автомат, (1965)
-Автомобиль, любовь и горчица, (1966)
-Агент Г. С., (1966)
-Агент уходит в океан, (1989)
-Аист, (1956)
-Ай-ай-ай, (1989)
-Айболит и Бармалей, (1973)
-Академик Иванов, (1986)
-Акционеры, (1963)
-Аленький цветочек, (1952)
-Алёшины сказки, (1964)
-Али-Баба и сорок разбойников, (1958)
-Алим и его ослик, (1978)
-Алло, вас слышу!, (1971)
-Аль-Фатиха. Мусульманская молитва, (2001)
-Ананси, (1970)
-Античная лирика, (1989)
-Антошка — Весёлая карусель № 1, (1969)
-Апельсин — Весёлая карусель № 8, (1976)
-Ара, бара, пух!, (1986)
-Аргонавты, (1971)
-Архангельские новеллы, (1986)
-Африканская сказка, (1963)
-Ах, эти жмурки!, (1994)`;
+Mister Пронька, (1991)`;
 
 // convert items
 const converted = items.split('\n').map(item => {
@@ -51,37 +24,70 @@ const converted = items.split('\n').map(item => {
     }
 })
 
-console.log(converted);
-
 const result = [];
 
-for (const convertedElement of converted) {
-    fetch(
-  'https://kinopoiskapiunofficial.tech/api/v2.2/films?' +
-    new URLSearchParams({
-      yearFrom: 1978,
-      yearTo: 1978,
-      keyword: 'Алим и его ослик',
-    }),
-  {
-    method: 'GET',
-    headers: {
-      'X-API-KEY': '79c1b5a4-b204-4109-aff6-0659663f06f5',
-      'Content-Type': 'application/json',
-    },
-  },
-)
-  .then((res) => res.json())
-  .then((json) => {
-      const item = json.items[0];
-      if (!item) {
-          items.push({
-
-          })
-
-      }
-
-  })
-  .catch((err) => console.error(err));
+for (let i = 0; i < converted.length; i++) {
+    setTimeout(() => {
+        fetch(
+            'https://kinopoiskapiunofficial.tech/api/v2.2/films?' +
+            new URLSearchParams({
+                yearFrom: converted[i].year,
+                yearTo: converted[i].year,
+                keyword: converted[i].name
+            }),
+            {
+                method: 'GET',
+                headers: {
+                    'X-API-KEY': '79c1b5a4-b204-4109-aff6-0659663f06f5',
+                    'Content-Type': 'application/json',
+                },
+            },
+        )
+            .then((res) => res.json())
+            .then((json) => {
+                const item = json?.items?.at(0);
+                console.log(i, ':', item?.nameRu, '%', converted[i].name);
+                if (!item) {
+                    result.push({
+                        name: converted[i].name + ' (not found)',
+                        image: '',
+                        rating: 0,
+                        status: 'postponed',
+                        type: 'movie',
+                        restriction: '',
+                        genres: ['TEMPLATE'],
+                        time: {
+                            count: 1,
+                            duration: 0
+                        },
+                        year: '',
+                        developers: ['Союзмультфильм'],
+                        franchise: ''
+                    })
+                } else {
+                    result.push({
+                        name: json.total > 1 ? converted[i].name + ' %% ' + item.nameRu : item.nameRu,
+                        image: item.posterUrlPreview || '',
+                        rating: 0,
+                        status: 'postponed',
+                        type: 'movie',
+                        restriction: '',
+                        genres: ['TEMPLATE'].concat(item.genres?.map(genre => genre?.genre[0]?.toUpperCase() + genre?.genre?.slice(1))),
+                        time: {
+                            count: 1,
+                            duration: 0
+                        },
+                        year: item.year.toString() || '',
+                        developers: ['Союзмультфильм'],
+                        franchise: ''
+                    })
+                }
+                console.log(i, converted.length - 1);
+                if (i === converted.length - 1) {
+                    fs.writeFileSync('result.json', JSON.stringify(result));
+                }
+            })
+            .catch((err) => console.error(err));
+    }, i * 2000);
 }
 

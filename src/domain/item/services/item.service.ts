@@ -22,15 +22,7 @@ export class ItemService {
 
   async findAll(userID: string): Promise<Item[]> {
     const user = await this.userModel.findById(userID);
-    await this.userModel.updateOne(
-      { _id: userID },
-      { $set: { items: user.items.filter((i) => !(i instanceof Array)) } },
-    );
-    console.log('ITEM', user.items.at(-1));
-    return user.items.sort((a, b) => {
-      if (!a.name) console.log(a);
-      return a.name.localeCompare(b.name);
-    });
+    return user.items.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   async findByType(userID: string, type: string): Promise<Item[]> {
