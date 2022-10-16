@@ -22,7 +22,15 @@ export class ItemService {
 
   async findAll(userID: string): Promise<Item[]> {
     const user = await this.userModel.findById(userID);
-    return user.items.sort((a, b) => a.name.localeCompare(b.name));
+    await this.userModel.updateOne(
+      { _id: userID },
+      { $set: { items: user.items.filter((i) => !(i instanceof Array)) } },
+    );
+    console.log('ITEM', user.items.at(-1));
+    return user.items.sort((a, b) => {
+      if (!a.name) console.log(a);
+      return a.name.localeCompare(b.name);
+    });
   }
 
   async findByType(userID: string, type: string): Promise<Item[]> {
@@ -88,7 +96,10 @@ export class ItemService {
       id: new Types.ObjectId().toHexString(),
       ...i,
     }));
-    await this.userModel.updateOne({ _id: userID }, { $push: { items } });
+    await this.userModel.updateOne(
+      { _id: userID },
+      { $push: { items: { $each: items } } },
+    );
     return data;
   }
 }
