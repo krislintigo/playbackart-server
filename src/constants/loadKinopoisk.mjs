@@ -2,18 +2,7 @@
 import fetch from "node-fetch";
 import fs from "fs";
 
-const items = `25-е, первый день, (1968)
-38 попугаев, (1976) 
-38 Попугаев. А вдруг получится!, (1978)  
-38 Попугаев. Бабушка удава, (1977) 
-38 Попугаев. Великое закрытие, (1985)
-38 Попугаев. Завтра будет завтра, (1979)
-38 Попугаев. Зарядка для хвоста, (1979)
-38 Попугаев. Как лечить удава, (1977)
-38 Попугаев. Куда идет Слонёнок, (1977)
-38 попугаев. Ненаглядное пособие, (1991)
-38 Попугаев. Привет мартышке, (1978)
-Mister Пронька, (1991)`;
+const items = ``;
 
 // convert items
 const converted = items.split('\n').map(item => {
@@ -25,6 +14,7 @@ const converted = items.split('\n').map(item => {
 })
 
 const result = [];
+let counter = 0;
 
 for (let i = 0; i < converted.length; i++) {
     setTimeout(() => {
@@ -82,12 +72,13 @@ for (let i = 0; i < converted.length; i++) {
                         franchise: ''
                     })
                 }
-                console.log(i, converted.length - 1);
-                if (i === converted.length - 1) {
+                counter++;
+                console.log(counter, '/', converted.length);
+                if (counter === converted.length - 1) {
                     fs.writeFileSync('result.json', JSON.stringify(result));
                 }
             })
             .catch((err) => console.error(err));
-    }, i * 2000);
+    }, i * 200);
 }
 
