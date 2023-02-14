@@ -19,6 +19,26 @@ import { UpdateItemDto } from './dtos/update-item.dto';
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
+  @Get('fix')
+  async fix(@Jwt('id') userID: string): Promise<answerType> {
+    const data = await this.itemService.fix(userID);
+    return {
+      statusCode: HttpStatus.OK,
+      message: answers.success.item.loaded,
+      data,
+    };
+  }
+
+  @Get('clear')
+  async clear(@Jwt('id') userID: string): Promise<answerType> {
+    const data = await this.itemService.clear(userID);
+    return {
+      statusCode: HttpStatus.OK,
+      message: answers.success.item.loaded,
+      data,
+    };
+  }
+
   @Post()
   async create(
     @Body() item: ItemDto,

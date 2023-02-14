@@ -94,4 +94,12 @@ export class ItemService {
     );
     return data;
   }
+
+  async clear(userID: string): Promise<void> {
+    await this.userModel.updateOne({ _id: userID }, { $set: { items: [] } });
+  }
+
+  async fix(userID: string): Promise<void> {
+    //
+  }
 }
