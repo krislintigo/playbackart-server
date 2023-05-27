@@ -5,9 +5,9 @@ import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
 
 import { itemClient } from './services/item/item.shared'
-export type { Item, ItemData, ItemQuery, ItemPatch } from './services/item/item.shared'
 
 import { userClient } from './services/user/user.shared'
+export type { Item, ItemData, ItemQuery, ItemPatch } from './services/item/item.shared'
 export type { User, UserData, UserQuery, UserPatch } from './services/user/user.shared'
 
 export interface Configuration {
@@ -28,7 +28,7 @@ export type ClientApplication = Application<ServiceTypes, Configuration>
  */
 export const createClient = <Configuration = any>(
   connection: TransportConnection<ServiceTypes>,
-  authenticationOptions: Partial<AuthenticationClientOptions> = {}
+  authenticationOptions: Partial<AuthenticationClientOptions> = {},
 ) => {
   const client: ClientApplication = feathers()
 

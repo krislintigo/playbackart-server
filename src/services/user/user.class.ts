@@ -21,6 +21,6 @@ export class UserService<ServiceParams extends Params = UserParams> extends Mong
 export const getOptions = (app: Application): MongoDBAdapterOptions => {
   return {
     paginate: app.get('paginate'),
-    Model: app.get('mongodbClient').then((db) => db.collection('users'))
+    Model: app.get('mongodbClient').then((db) => db.collection('users')),
   }
 }
