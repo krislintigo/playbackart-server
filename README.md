@@ -1,46 +1,41 @@
+# playbackart-server
 
-## Installation
+> 
 
-```bash
-$ npm install
+## About
+
+This project uses [Feathers](http://feathersjs.com). An open source framework for building APIs and real-time applications.
+
+## Getting Started
+
+1. Make sure you have [NodeJS](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed.
+2. Install your dependencies
+
+    ```
+    cd path/to/playbackart-server
+    npm install
+    ```
+
+3. Start your app
+
+    ```
+    npm run compile # Compile TypeScript source
+    npm start
+    ```
+
+## Testing
+
+Run `npm test` and all your tests in the `test/` directory will be run.
+
+## Scaffolding
+
+This app comes with a powerful command line interface for Feathers. Here are a few things it can do:
+
+```
+$ npx feathers help                           # Show all commands
+$ npx feathers generate service               # Generate a new Service
 ```
 
-## Running the app
+## Help
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+For more information on all the things you can do with Feathers visit [docs.feathersjs.com](http://docs.feathersjs.com).
