@@ -20,7 +20,7 @@ export const itemSchema = Type.Object(
     rating: Type.Number({ minimum: 1, maximum: 10 }),
     status: StringEnum(['in-process', 'planned', 'completed', 'postponed', 'abandoned']),
     type: StringEnum(['movie', 'series', 'game', 'book']),
-    restriction: StringEnum([]),
+    restriction: StringEnum(['G', 'PG', 'PG-13', 'R', 'NC-17']),
     genres: Type.Array(Type.String()),
     time: Type.Object({
       count: Type.Number({ minimum: 1 }),

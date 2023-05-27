@@ -3,9 +3,7 @@ import { feathers } from '@feathersjs/feathers'
 import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
-
 import { itemClient } from './services/item/item.shared'
-
 import { userClient } from './services/user/user.shared'
 export type { Item, ItemData, ItemQuery, ItemPatch } from './services/item/item.shared'
 export type { User, UserData, UserQuery, UserPatch } from './services/user/user.shared'

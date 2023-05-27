@@ -1,4 +1,5 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/application.html
+import '../config/env.js'
 import { feathers } from '@feathersjs/feathers'
 import configuration from '@feathersjs/configuration'
 import { koa, rest, bodyParser, errorHandler, parseAuthentication, cors, serveStatic } from '@feathersjs/koa'
@@ -8,6 +9,7 @@ import { configurationValidator } from './configuration'
 import type { Application } from './declarations'
 import { logError } from './logger'
 import { mongodb } from './mongodb'
+import { authentication } from './authentication'
 import { services } from './services'
 import { channels } from './channels'
 import { appCreateResolver, appPatchResolver } from './app.schema'
@@ -35,6 +37,7 @@ app.configure(
 )
 app.configure(channels)
 app.configure(mongodb)
+app.configure(authentication)
 app.configure(services)
 
 // Register hooks that run on all service methods

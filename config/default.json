@@ -12,7 +12,7 @@
   "authentication": {
     "entity": "user",
     "service": "users",
-    "secret": "Oddfg840FuhzhjfkjhdfkjhFuZnKzHmNx+ST+o",
+    "secret": "w5w+X3Jbz00V3WqcXlT0v+1iKTmj/jze",
     "authStrategies": [
       "jwt",
       "local"
@@ -29,6 +29,5 @@
       "usernameField": "email",
       "passwordField": "password"
     }
-  },
-  "mongodb": "mongodb+srv://1sses:abobaamogus123@main.mrimlsc.mongodb.net/v2?retryWrites=true&w=majority"
+  }
 }
