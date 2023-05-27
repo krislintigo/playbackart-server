@@ -41,7 +41,7 @@ export const itemResolver = resolve<Item, HookContext>({})
 export const itemExternalResolver = resolve<Item, HookContext>({})
 
 // Schema for creating new entries
-export const itemDataSchema = Type.Omit(itemSchema, ['user'], {
+export const itemDataSchema = Type.Omit(itemSchema, ['_id', 'user'], {
   $id: 'ItemData',
 })
 export type ItemData = Static<typeof itemDataSchema>

@@ -30,7 +30,7 @@ export const userExternalResolver = resolve<User, HookContext>({
 })
 
 // Schema for creating new entries
-export const userDataSchema = Type.Omit(userSchema, [], {
+export const userDataSchema = Type.Omit(userSchema, ['_id'], {
   $id: 'UserData',
 })
 export type UserData = Static<typeof userDataSchema>
