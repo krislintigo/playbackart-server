@@ -2,11 +2,8 @@
 import type { Params } from '@feathersjs/feathers'
 import { MongoDBService } from '@feathersjs/mongodb'
 import type { MongoDBAdapterParams, MongoDBAdapterOptions } from '@feathersjs/mongodb'
-
 import type { Application } from '../../declarations'
 import type { Item, ItemData, ItemPatch, ItemQuery } from './item.schema'
-import { app } from '../../app'
-
 export type { Item, ItemData, ItemPatch, ItemQuery }
 
 export interface ItemParams extends MongoDBAdapterParams<ItemQuery> {}
@@ -18,9 +15,46 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
   ItemParams,
   ItemPatch
 > {
-  async filters({ login }: { login: string }, _params: ServiceParams) {
-    const result = await this._find({
-      // query: { login },
+  async filters(
+    { userId, type }: { userId: string | undefined; type: Item['type'] | undefined },
+    _params: ServiceParams,
+  ): Promise<{
+    ratings: Array<{
+      value: number
+      count: number
+    }>
+    restrictions: Array<{
+      value: string
+      count: number
+    }>
+    genres: Array<{
+      value: string
+      ratings: number[]
+      durations: number[]
+      count: number
+    }>
+    developers: Array<{
+      value: string
+      ratings: number[]
+      durations: number[]
+      count: number
+    }>
+    franchises: Array<{
+      value: string
+      ratings: number[]
+      durations: number[]
+      count: number
+    }>
+    total: {
+      count: number
+      duration: number
+    }
+  }> {
+    const result = (await this._find({
+      query: {
+        ...(type && { type }),
+        ...(userId && { userId }),
+      },
       pipeline: [
         {
           $facet: {
@@ -164,7 +198,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
         },
       ],
       paginate: false,
-    })
+    })) as any
     return result.at(0)
   }
 }
@@ -173,5 +207,6 @@ export const getOptions = (app: Application): MongoDBAdapterOptions => {
   return {
     paginate: app.get('paginate'),
     Model: app.get('mongodbClient').then((db) => db.collection('items')),
+    operators: ['$regex', '$options'],
   }
 }
