@@ -39,7 +39,13 @@ export const items = (app: Application) => {
       remove: [authenticate('jwt')],
     },
     before: {
-      all: [schemaHooks.validateQuery(itemQueryValidator), schemaHooks.resolveQuery(itemQueryResolver)],
+      all: [
+        (ctx) => {
+          console.log(ctx.params.query)
+        },
+        // schemaHooks.validateQuery(itemQueryValidator),
+        schemaHooks.resolveQuery(itemQueryResolver),
+      ],
       find: [],
       get: [],
       create: [schemaHooks.validateData(itemDataValidator), schemaHooks.resolveData(itemDataResolver)],

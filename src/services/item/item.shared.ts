@@ -9,7 +9,7 @@ export type ItemClientService = Pick<ItemService<Params<ItemQuery>>, (typeof ite
 
 export const itemPath = 'items'
 
-export const itemMethods = ['find', 'get', 'create', 'patch', 'remove'] as const
+export const itemMethods = ['find', 'get', 'create', 'patch', 'remove', 'filters'] as const
 
 export const itemClient = (client: ClientApplication) => {
   const connection = client.get('connection')
