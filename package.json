@@ -46,6 +46,7 @@
     "bundle:client": "npm run compile && npm pack --pack-destination ./public"
   },
   "dependencies": {
+    "@casl/ability": "^6.5.0",
     "@feathersjs/adapter-commons": "5.0.5",
     "@feathersjs/authentication": "5.0.5",
     "@feathersjs/authentication-client": "5.0.5",
@@ -61,6 +62,7 @@
     "@feathersjs/transport-commons": "5.0.5",
     "@feathersjs/typebox": "5.0.5",
     "dotenv": "^16.0.3",
+    "feathers-casl": "^2.0.0",
     "mongodb": "5.2.0",
     "winston": "^3.9.0"
   },

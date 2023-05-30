@@ -50,10 +50,12 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       duration: number
     }
   }> {
-    const result = (await this._find({
+    if (!userId) throw new Error('No userId provided')
+
+    const result = (await this.find({
       query: {
         ...(type && { type }),
-        ...(userId && { userId }),
+        userId,
       },
       pipeline: [
         {
@@ -193,7 +195,13 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
             genres: 1,
             developers: 1,
             franchises: 1,
-            total: { $arrayElemAt: ['$total', 0] },
+            total: {
+              $cond: {
+                if: { $ne: [{ $size: '$total' }, 0] },
+                then: { $arrayElemAt: ['$total', 0] },
+                else: { count: 0, duration: 0 },
+              },
+            },
           },
         },
       ],
@@ -208,5 +216,6 @@ export const getOptions = (app: Application): MongoDBAdapterOptions => {
     paginate: app.get('paginate'),
     Model: app.get('mongodbClient').then((db) => db.collection('items')),
     operators: ['$regex', '$options'],
+    multi: ['create'],
   }
 }

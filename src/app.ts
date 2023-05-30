@@ -13,6 +13,7 @@ import { authentication } from './authentication'
 import { services } from './services'
 import { channels } from './channels'
 import { appCreateResolver, appPatchResolver } from './app.schema'
+import { feathersCasl } from 'feathers-casl'
 
 const app: Application = koa(feathers())
 
@@ -35,6 +36,7 @@ app.configure(
     },
   }),
 )
+app.configure(feathersCasl({ defaultAdapter: '@feathersjs/mongodb' }))
 app.configure(channels)
 app.configure(mongodb)
 app.configure(authentication)

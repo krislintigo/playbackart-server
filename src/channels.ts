@@ -4,6 +4,7 @@ import type { AuthenticationResult } from '@feathersjs/authentication'
 import '@feathersjs/transport-commons'
 import type { Application, HookContext } from './declarations'
 import { logger } from './logger'
+import { getChannelsWithReadAbility, makeChannelOptions } from 'feathers-casl'
 
 export const channels = (app: Application) => {
   logger.warn(
@@ -19,12 +20,22 @@ export const channels = (app: Application) => {
     // connection can be undefined if there is no
     // real-time connection, e.g. when logging in via REST
     if (connection) {
+      if (authResult.ability) {
+        connection.ability = authResult.ability
+        connection.rules = authResult.rules
+      }
       // The connection is no longer anonymous, remove it
       app.channel('anonymous').leave(connection)
 
       // Add it to the authenticated user channel
       app.channel('authenticated').join(connection)
     }
+  })
+
+  const caslOptions = makeChannelOptions(app)
+
+  app.publish((data: any, context) => {
+    return getChannelsWithReadAbility(app, data, context, caslOptions)
   })
 
   // eslint-disable-next-line no-unused-vars

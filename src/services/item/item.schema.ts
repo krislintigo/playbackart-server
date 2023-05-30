@@ -7,6 +7,7 @@ import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
 import { userSchema } from '../user/user.schema'
 import { createdAndUpdatedAt } from '../common.schema'
+import { resolveOptionalObjectId, resolveOptionalQueryObjectId } from '../../resolvers/objectId'
 
 // Main data model schema
 export const itemSchema = Type.Object(
@@ -46,7 +47,9 @@ export const itemDataSchema = Type.Omit(itemSchema, ['_id', 'user'], {
 })
 export type ItemData = Static<typeof itemDataSchema>
 export const itemDataValidator = getValidator(itemDataSchema, dataValidator)
-export const itemDataResolver = resolve<Item, HookContext>({})
+export const itemDataResolver = resolve<Item, HookContext>({
+  userId: resolveOptionalObjectId,
+})
 
 // Schema for updating existing entries
 export const itemPatchSchema = Type.Partial(itemSchema, {
@@ -54,7 +57,9 @@ export const itemPatchSchema = Type.Partial(itemSchema, {
 })
 export type ItemPatch = Static<typeof itemPatchSchema>
 export const itemPatchValidator = getValidator(itemPatchSchema, dataValidator)
-export const itemPatchResolver = resolve<Item, HookContext>({})
+export const itemPatchResolver = resolve<Item, HookContext>({
+  userId: resolveOptionalObjectId,
+})
 
 // Schema for allowed query properties
 export const itemQueryProperties = Type.Omit(itemSchema, ['user'])
@@ -68,4 +73,6 @@ export const itemQuerySchema = Type.Intersect(
 )
 export type ItemQuery = Static<typeof itemQuerySchema>
 export const itemQueryValidator = getValidator(itemQuerySchema, queryValidator)
-export const itemQueryResolver = resolve<ItemQuery, HookContext>({})
+export const itemQueryResolver = resolve<ItemQuery, HookContext>({
+  userId: resolveOptionalQueryObjectId,
+})

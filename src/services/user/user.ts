@@ -17,6 +17,7 @@ import {
 import type { Application } from '../../declarations'
 import { UserService, getOptions } from './user.class'
 import { userPath, userMethods } from './user.shared'
+import { authorize } from 'feathers-casl'
 
 export * from './user.class'
 export * from './user.schema'
@@ -35,10 +36,10 @@ export const users = (app: Application) => {
     around: {
       all: [schemaHooks.resolveExternal(userExternalResolver), schemaHooks.resolveResult(userResolver)],
       create: [],
-      find: [authenticate('jwt')],
-      get: [authenticate('jwt')],
-      patch: [authenticate('jwt')],
-      remove: [authenticate('jwt')],
+      find: [authenticate('jwt'), authorize()],
+      get: [],
+      patch: [authenticate('jwt'), authorize()],
+      remove: [authenticate('jwt'), authorize()],
     },
     before: {
       all: [schemaHooks.validateQuery(userQueryValidator), schemaHooks.resolveQuery(userQueryResolver)],

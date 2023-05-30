@@ -17,6 +17,7 @@ import {
 import type { Application } from '../../declarations'
 import { ItemService, getOptions } from './item.class'
 import { itemPath, itemMethods } from './item.shared'
+import { authorize } from 'feathers-casl'
 
 export * from './item.class'
 export * from './item.schema'
@@ -34,15 +35,12 @@ export const items = (app: Application) => {
   app.service(itemPath).hooks({
     around: {
       all: [schemaHooks.resolveExternal(itemExternalResolver), schemaHooks.resolveResult(itemResolver)],
-      create: [authenticate('jwt')],
-      patch: [authenticate('jwt')],
-      remove: [authenticate('jwt')],
+      create: [authenticate('jwt'), authorize()],
+      patch: [authenticate('jwt'), authorize()],
+      remove: [authenticate('jwt'), authorize()],
     },
     before: {
       all: [
-        (ctx) => {
-          console.log(ctx.params.query)
-        },
         // schemaHooks.validateQuery(itemQueryValidator),
         schemaHooks.resolveQuery(itemQueryResolver),
       ],
