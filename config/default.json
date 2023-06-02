@@ -7,7 +7,7 @@
   ],
   "paginate": {
     "default": 20,
-    "max": 50
+    "max": 100
   },
   "authentication": {
     "entity": "user",
@@ -23,7 +23,7 @@
       },
       "audience": "https://yourdomain.com",
       "algorithm": "HS256",
-      "expiresIn": "1d"
+      "expiresIn": "15d"
     },
     "local": {
       "usernameField": "login",
