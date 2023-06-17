@@ -1,9 +1,12 @@
-import { resolveObjectId, resolveQueryObjectId } from '@feathersjs/mongodb'
+import {
+  resolveObjectId as _resolveObjectId,
+  resolveQueryObjectId as _resolveQueryObjectId,
+} from '@feathersjs/mongodb'
 
-export const resolveOptionalObjectId = async (value: any) => {
-  if (value) return await resolveObjectId(value)
+export const resolveObjectId = async (value: any) => {
+  if (value) return await _resolveObjectId(value)
 }
 
-export const resolveOptionalQueryObjectId = async (value: any) => {
-  if (value) return await resolveQueryObjectId(value)
+export const resolveQueryObjectId = async (value: any) => {
+  if (value) return await _resolveQueryObjectId(value)
 }

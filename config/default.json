@@ -7,7 +7,7 @@
   ],
   "paginate": {
     "default": 20,
-    "max": 100
+    "max": 500
   },
   "authentication": {
     "entity": "user",

@@ -172,16 +172,17 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
             total: [
               {
                 $group: {
-                  _id: null,
+                  _id: '$status',
                   count: { $sum: 1 },
                   duration: { $sum: { $multiply: ['$time.count', '$time.duration'] } },
                 },
               },
               {
                 $project: {
-                  _id: 0,
+                  status: '$_id',
                   count: 1,
                   duration: 1,
+                  _id: 0,
                 },
               },
             ],
@@ -195,13 +196,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
             genres: 1,
             developers: 1,
             franchises: 1,
-            total: {
-              $cond: {
-                if: { $ne: [{ $size: '$total' }, 0] },
-                then: { $arrayElemAt: ['$total', 0] },
-                else: { count: 0, duration: 0 },
-              },
-            },
+            total: 1,
           },
         },
       ],
