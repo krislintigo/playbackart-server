@@ -31,24 +31,29 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       value: string
       ratings: number[]
       durations: number[]
+      fullDurations: number[]
       count: number
     }>
     developers: Array<{
       value: string
       ratings: number[]
       durations: number[]
+      fullDurations: number[]
       count: number
     }>
     franchises: Array<{
       value: string
       ratings: number[]
       durations: number[]
+      fullDurations: number[]
       count: number
     }>
-    total: {
+    total: Array<{
+      status: Item['status']
       count: number
       duration: number
-    }
+      fullDuration: number[]
+    }>
   }> {
     if (!userId) throw new Error('No userId provided')
 
@@ -99,6 +104,9 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
                   _id: '$genres',
                   ratings: { $push: '$rating' },
                   durations: { $push: { $multiply: ['$time.count', '$time.duration'] } },
+                  fullDurations: {
+                    $push: { $multiply: [{ $add: ['$time.replays', 1] }, '$time.count', '$time.duration'] },
+                  },
                   count: { $sum: 1 },
                 },
               },
@@ -110,6 +118,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
                       value: '$_id',
                       ratings: '$ratings',
                       durations: '$durations',
+                      fullDurations: '$fullDurations',
                       count: '$count',
                     },
                   },
@@ -125,6 +134,9 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
                   _id: '$developers',
                   ratings: { $push: '$rating' },
                   durations: { $push: { $multiply: ['$time.count', '$time.duration'] } },
+                  fullDurations: {
+                    $push: { $multiply: [{ $add: ['$time.replays', 1] }, '$time.count', '$time.duration'] },
+                  },
                   count: { $sum: 1 },
                 },
               },
@@ -136,6 +148,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
                       value: '$_id',
                       ratings: '$ratings',
                       durations: '$durations',
+                      fullDurations: '$fullDurations',
                       count: '$count',
                     },
                   },
@@ -150,6 +163,9 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
                   _id: '$franchise',
                   ratings: { $push: '$rating' },
                   durations: { $push: { $multiply: ['$time.count', '$time.duration'] } },
+                  fullDurations: {
+                    $push: { $multiply: [{ $add: ['$time.replays', 1] }, '$time.count', '$time.duration'] },
+                  },
                   count: { $sum: 1 },
                 },
               },
@@ -161,6 +177,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
                       value: '$_id',
                       ratings: '$ratings',
                       durations: '$durations',
+                      fullDurations: '$fullDurations',
                       count: '$count',
                     },
                   },
@@ -175,14 +192,18 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
                   _id: '$status',
                   count: { $sum: 1 },
                   duration: { $sum: { $multiply: ['$time.count', '$time.duration'] } },
+                  fullDuration: {
+                    $sum: { $multiply: [{ $add: ['$time.replays', 1] }, '$time.count', '$time.duration'] },
+                  },
                 },
               },
               {
                 $project: {
+                  _id: 0,
                   status: '$_id',
                   count: 1,
                   duration: 1,
-                  _id: 0,
+                  fullDuration: 1,
                 },
               },
             ],

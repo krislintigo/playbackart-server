@@ -25,6 +25,7 @@ export const itemSchema = Type.Object(
     time: Type.Object({
       count: Type.Number({ minimum: 1 }),
       duration: Type.Number({ minimum: 0 }),
+      replays: Type.Number({ minimum: 0 }),
     }),
     year: Type.String(),
     developers: Type.Array(Type.String()),

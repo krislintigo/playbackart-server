@@ -63,6 +63,7 @@
     "@feathersjs/typebox": "5.0.5",
     "dotenv": "^16.0.3",
     "feathers-casl": "^2.0.0",
+    "migrate-mongo": "^10.0.0",
     "mongodb": "5.2.0",
     "winston": "^3.9.0"
   },
