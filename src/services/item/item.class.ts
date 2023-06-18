@@ -17,7 +17,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
 > {
   async filters(
     { userId, type }: { userId: string | undefined; type: Item['type'] | undefined },
-    _params: ServiceParams,
+    _params?: ServiceParams,
   ): Promise<{
     ratings: Array<{
       value: number
