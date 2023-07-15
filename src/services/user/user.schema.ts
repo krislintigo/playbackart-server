@@ -15,6 +15,12 @@ export const userSchema = Type.Object(
     login: Type.String(),
     password: Type.String(),
     list: Type.String(),
+    trackedDevelopers: Type.Array(
+      Type.Object({
+        name: Type.String(),
+        description: Type.String(),
+      }),
+    ),
     trackedFranchises: Type.Array(
       Type.Object({
         name: Type.String(),
