@@ -16,7 +16,6 @@ export const authentication = (app: Application) => {
   authentication.register('jwt', new JWTStrategy())
   authentication.register('local', new LocalStrategy())
 
-  // @ts-expect-error
   app.use('authentication', authentication)
   app.service('authentication').hooks(hooks)
 }

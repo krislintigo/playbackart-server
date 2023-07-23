@@ -1,19 +1,12 @@
 import { getRestriction, getType } from './helpers'
-import fs from 'fs'
+import * as fs from 'fs'
 import { capitalize } from 'lodash'
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
 
-const ids: string[] = [
-  '666',
-  '323',
-  '106079',
-  '395978',
-  '496943',
-  '594736',
-  '754481',
-  '894027',
-  '964318',
-  '959062',
-]
+const argv = yargs(hideBin(process.argv)).argv as unknown as { ids: string }
+if (!argv.ids) throw new Error('Pass ids to command line!')
+const ids = argv.ids.toString().split(',')
 
 async function wait(milliseconds: number) {
   return await new Promise((resolve) => setTimeout(resolve, milliseconds))
@@ -21,6 +14,7 @@ async function wait(milliseconds: number) {
 
 async function main() {
   const mapped = ids.map(async (id, i) => {
+    console.log(id)
     await wait(i * 100)
     const response = await fetch(`https://kinopoiskapiunofficial.tech/api/v2.2/films/${id}`, {
       method: 'GET',

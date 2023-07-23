@@ -1,5 +1,11 @@
+// my userId - 6474e01af873f22f6090936d
 import { app } from '../src/app'
-import fs from 'fs/promises'
+import * as fs from 'fs/promises'
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+
+const argv = yargs(hideBin(process.argv)).argv as unknown as { userId: string }
+if (!argv.userId) throw new Error('Pass userId to command line!')
 
 async function main() {
   const data = await fs.readFile('./api/result.json', 'utf8')
@@ -20,10 +26,11 @@ async function main() {
     year: item.year || '',
     developers: item.developers || [],
     franchise: item.franchise || '',
-    userId: '6474e01af873f22f6090936d',
+    userId: argv.userId,
   }))
   console.log(creations.length)
   await app.service('items').create(creations)
+  process.exit()
 }
 
 void main()
