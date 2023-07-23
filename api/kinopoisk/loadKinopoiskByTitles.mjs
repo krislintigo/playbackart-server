@@ -1,5 +1,4 @@
 // https://api.kinopoisk.dev/movie?field=name&search=Алим%20и%20его%20ослик&field=year&search=1978&token=ZQQ8GMN-TN54SGK-NB3MKEC-ZKB8V06
-import fetch from "node-fetch";
 import fs from "fs";
 
 const items = ``;

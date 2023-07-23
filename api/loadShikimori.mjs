@@ -56,7 +56,7 @@ for (let i = 0; i < items.length; i++) {
           count: res.episodes || 1,
           duration: res.duration || 0,
         },
-        year: res.aired_on?.split('-')[0] || '1488',
+        year: res.aired_on?.split('-')[0] || '',
         developers: res.studios?.map((studio) => studio.name) || [],
         franchise: res.franchise || '',
       });

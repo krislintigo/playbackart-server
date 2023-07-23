@@ -1,21 +1,23 @@
 {
   "ts-node": {
-    "files": true
+    "files": true,
   },
   "compilerOptions": {
     "target": "es2020",
     "module": "commonjs",
     "outDir": "./lib",
-    "rootDir": "./src",
+    "rootDirs": ["./src", "./api"],
     "declaration": true,
     "strict": true,
     "esModuleInterop": true,
     "sourceMap": true
   },
   "include": [
-    "src"
+    "src",
+    "api"
   ],
   "exclude": [
-    "test"
+    "test",
+    "api"
   ]
 }
