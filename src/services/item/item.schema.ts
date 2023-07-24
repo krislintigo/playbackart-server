@@ -8,28 +8,47 @@ import { userSchema } from '../user/user.schema'
 import { createdAndUpdatedAt } from '../common.schema'
 import { resolveObjectId, resolveQueryObjectId } from '../../resolvers/objectId'
 
-// Main data model schema
+const config = {
+  seasons: Type.Object({
+    extended: Type.Boolean(),
+    multipleImages: Type.Boolean(),
+    multipleRatings: Type.Boolean(),
+    multipleDevelopers: Type.Boolean(),
+  }),
+  time: Type.Object({
+    extended: Type.Boolean(),
+  }),
+}
+
+const sharedData = {
+  name: Type.String(),
+  image: Type.String(),
+  rating: Type.Number({ minimum: 0, maximum: 10 }),
+  time: Type.Object({
+    count: Type.Number({ minimum: 1 }),
+    duration: Type.Number({ minimum: 0 }),
+    replays: Type.Number({ minimum: 0 }),
+  }),
+  year: Type.String(),
+  developers: Type.Array(Type.String()),
+}
+
 export const itemSchema = Type.Object(
   {
     _id: ObjectIdSchema(),
     userId: ObjectIdSchema(),
     user: Type.Ref(userSchema),
 
-    name: Type.String(),
-    image: Type.String(),
-    rating: Type.Number({ minimum: 0, maximum: 10 }),
+    config: Type.Object(config),
+
     status: StringEnum(['in-process', 'planned', 'completed', 'postponed', 'abandoned']),
     type: StringEnum(['movie', 'series', 'game', 'book']),
+
+    ...sharedData,
     restriction: StringEnum(['', 'G', 'PG', 'PG-13', 'R', 'NC-17']),
     genres: Type.Array(Type.String()),
-    time: Type.Object({
-      count: Type.Number({ minimum: 1 }),
-      duration: Type.Number({ minimum: 0 }),
-      replays: Type.Number({ minimum: 0 }),
-    }),
-    year: Type.String(),
-    developers: Type.Array(Type.String()),
     franchise: Type.String(),
+    seasons: Type.Array(Type.Object(sharedData)),
 
     ...createdAndUpdatedAt,
   },
