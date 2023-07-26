@@ -11,7 +11,7 @@ import { resolveObjectId, resolveQueryObjectId } from '../../resolvers/objectId'
 const config = {
   seasons: Type.Object({
     extended: Type.Boolean(),
-    multipleImages: Type.Boolean(),
+    multiplePosters: Type.Boolean(),
     multipleRatings: Type.Boolean(),
     multipleDevelopers: Type.Boolean(),
   }),
@@ -22,7 +22,7 @@ const config = {
 
 const sharedData = {
   name: Type.String(),
-  image: Type.String(),
+  poster: Type.String(),
   rating: Type.Number({ minimum: 0, maximum: 10 }),
   time: Type.Object({
     count: Type.Number({ minimum: 1 }),
