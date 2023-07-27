@@ -15,9 +15,9 @@ const config = {
     multipleRatings: Type.Boolean(),
     multipleDevelopers: Type.Boolean(),
   }),
-  time: Type.Object({
-    extended: Type.Boolean(),
-  }),
+  // time: Type.Object({
+  //   extended: Type.Boolean(),
+  // }),
 }
 
 const sharedData = {
