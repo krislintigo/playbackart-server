@@ -4,6 +4,12 @@ import { MongoDBService } from '@feathersjs/mongodb'
 import type { MongoDBAdapterParams, MongoDBAdapterOptions } from '@feathersjs/mongodb'
 import type { Application } from '../../declarations'
 import type { Item, ItemData, ItemPatch, ItemQuery } from './item.schema'
+import { totalAggregation } from './mongodb/total.aggregation'
+import { franchisesAggregation } from './mongodb/franchises.aggregation'
+import { developersAggregation } from './mongodb/developers.aggregation'
+import { genresAggregation } from './mongodb/genres.aggregation'
+import { restrictionsAggregation } from './mongodb/restrictions.aggregation'
+import { ratingsAggregation } from './mongodb/ratings.aggregation'
 export type { Item, ItemData, ItemPatch, ItemQuery }
 
 export interface ItemParams extends MongoDBAdapterParams<ItemQuery> {}
@@ -65,148 +71,12 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       pipeline: [
         {
           $facet: {
-            ratings: [
-              {
-                $group: {
-                  _id: '$rating',
-                  count: { $sum: 1 },
-                },
-              },
-              {
-                $group: {
-                  _id: null,
-                  ratings: { $push: { value: '$_id', count: '$count' } },
-                },
-              },
-              { $unwind: '$ratings' },
-              { $replaceRoot: { newRoot: '$ratings' } },
-            ],
-            restrictions: [
-              {
-                $group: {
-                  _id: '$restriction',
-                  count: { $sum: 1 },
-                },
-              },
-              {
-                $group: {
-                  _id: null,
-                  restrictions: { $push: { value: '$_id', count: '$count' } },
-                },
-              },
-              { $unwind: '$restrictions' },
-              { $replaceRoot: { newRoot: '$restrictions' } },
-            ],
-            genres: [
-              { $unwind: '$genres' },
-              {
-                $group: {
-                  _id: '$genres',
-                  ratings: { $push: '$rating' },
-                  durations: { $push: { $multiply: ['$time.count', '$time.duration'] } },
-                  fullDurations: {
-                    $push: { $multiply: [{ $add: ['$time.replays', 1] }, '$time.count', '$time.duration'] },
-                  },
-                  count: { $sum: 1 },
-                },
-              },
-              {
-                $group: {
-                  _id: null,
-                  genres: {
-                    $push: {
-                      value: '$_id',
-                      ratings: '$ratings',
-                      durations: '$durations',
-                      fullDurations: '$fullDurations',
-                      count: '$count',
-                    },
-                  },
-                },
-              },
-              { $unwind: '$genres' },
-              { $replaceRoot: { newRoot: '$genres' } },
-            ],
-            developers: [
-              { $unwind: '$developers' },
-              {
-                $group: {
-                  _id: '$developers',
-                  ratings: { $push: '$rating' },
-                  durations: { $push: { $multiply: ['$time.count', '$time.duration'] } },
-                  fullDurations: {
-                    $push: { $multiply: [{ $add: ['$time.replays', 1] }, '$time.count', '$time.duration'] },
-                  },
-                  count: { $sum: 1 },
-                },
-              },
-              {
-                $group: {
-                  _id: null,
-                  developers: {
-                    $push: {
-                      value: '$_id',
-                      ratings: '$ratings',
-                      durations: '$durations',
-                      fullDurations: '$fullDurations',
-                      count: '$count',
-                    },
-                  },
-                },
-              },
-              { $unwind: '$developers' },
-              { $replaceRoot: { newRoot: '$developers' } },
-            ],
-            franchises: [
-              {
-                $group: {
-                  _id: '$franchise',
-                  ratings: { $push: '$rating' },
-                  durations: { $push: { $multiply: ['$time.count', '$time.duration'] } },
-                  fullDurations: {
-                    $push: { $multiply: [{ $add: ['$time.replays', 1] }, '$time.count', '$time.duration'] },
-                  },
-                  count: { $sum: 1 },
-                },
-              },
-              {
-                $group: {
-                  _id: null,
-                  franchises: {
-                    $push: {
-                      value: '$_id',
-                      ratings: '$ratings',
-                      durations: '$durations',
-                      fullDurations: '$fullDurations',
-                      count: '$count',
-                    },
-                  },
-                },
-              },
-              { $unwind: '$franchises' },
-              { $replaceRoot: { newRoot: '$franchises' } },
-            ],
-            total: [
-              {
-                $group: {
-                  _id: '$status',
-                  count: { $sum: 1 },
-                  duration: { $sum: { $multiply: ['$time.count', '$time.duration'] } },
-                  fullDuration: {
-                    $sum: { $multiply: [{ $add: ['$time.replays', 1] }, '$time.count', '$time.duration'] },
-                  },
-                },
-              },
-              {
-                $project: {
-                  _id: 0,
-                  status: '$_id',
-                  count: 1,
-                  duration: 1,
-                  fullDuration: 1,
-                },
-              },
-            ],
+            ratings: ratingsAggregation,
+            restrictions: restrictionsAggregation,
+            genres: genresAggregation,
+            developers: developersAggregation,
+            franchises: franchisesAggregation,
+            total: totalAggregation,
           },
         },
         {
@@ -234,4 +104,39 @@ export const getOptions = (app: Application): MongoDBAdapterOptions => {
     operators: ['$regex', '$options'],
     multi: ['create'],
   }
+}
+
+// seasons: {
+//   extended: boolean,
+//   multiplePosters: boolean,
+//   multipleRatings: boolean,
+//   multipleDevelopers: boolean,
+// },
+
+interface Item2 {
+  _id: string
+  name: string
+  poster: string
+  rating: number
+  time: {
+    count: number
+    duration: number
+    replays: number
+  }
+  year: string
+  developers: string[]
+  genres: string[]
+  franchise: string
+  seasons: Array<{
+    name: string
+    poster: string
+    rating: number
+    time: {
+      count: number
+      duration: number
+      replays: number
+    }
+    year: string
+    developers: string[]
+  }>
 }
