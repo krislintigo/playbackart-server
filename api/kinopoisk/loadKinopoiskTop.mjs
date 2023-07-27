@@ -26,7 +26,7 @@ for (let page = 13; page <= 13; page++) {
               result.push({
                   userId: '6474e01af873f22f6090936d',
                   name: film.nameRu,
-                  image: film.posterUrlPreview || '',
+                  poster: film.posterUrlPreview || '',
                   rating: 0,
                   status: 'postponed',
                   type: 'movie',

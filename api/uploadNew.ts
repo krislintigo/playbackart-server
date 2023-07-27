@@ -12,7 +12,7 @@ async function main() {
   const items = JSON.parse(data)
   const creations = items.map((item: any) => ({
     name: item.name,
-    image: item.image || '',
+    poster: item.poster || '',
     rating: item.rating || 0,
     status: item.status,
     type: item.type,

@@ -27,7 +27,7 @@ async function main() {
     console.log(id, ':', film?.nameRu)
     return {
       name: film.nameRu,
-      image: film.posterUrlPreview || '',
+      poster: film.posterUrlPreview || '',
       rating: 0,
       status: 'postponed',
       type: getType(film.type),

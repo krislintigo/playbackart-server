@@ -39,7 +39,7 @@ for (let i = 0; i < converted.length; i++) {
                 if (!item) {
                     result.push({
                         name: converted[i].name + ' (not found)',
-                        image: '',
+                        poster: '',
                         rating: 0,
                         status: 'postponed',
                         type: 'movie',
@@ -56,7 +56,7 @@ for (let i = 0; i < converted.length; i++) {
                 } else {
                     result.push({
                         name: json.total > 1 ? converted[i].name + ' %% ' + item.nameRu : item.nameRu,
-                        image: item.posterUrlPreview || '',
+                        poster: item.posterUrlPreview || '',
                         rating: 0,
                         status: 'postponed',
                         type: 'movie',

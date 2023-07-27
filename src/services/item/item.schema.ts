@@ -15,6 +15,7 @@ const config = {
     multipleRatings: Type.Boolean(),
     multipleDevelopers: Type.Boolean(),
   }),
+  // later
   // time: Type.Object({
   //   extended: Type.Boolean(),
   // }),
