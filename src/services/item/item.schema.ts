@@ -5,7 +5,7 @@ import type { Static } from '@feathersjs/typebox'
 import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
 import { userSchema } from '../user/user.schema'
-import { createdAndUpdatedAt } from '../common.schema'
+import { createdAndUpdatedAt, file } from '../common.schema'
 import { resolveObjectId, resolveQueryObjectId } from '../../resolvers/objectId'
 
 const config = {
@@ -23,7 +23,8 @@ const config = {
 
 const sharedData = {
   name: Type.String(),
-  poster: Type.String(),
+  // poster: Type.String(),
+  poster: Type.Object(file),
   rating: Type.Number({ minimum: 0, maximum: 10 }),
   time: Type.Object({
     count: Type.Number({ minimum: 1 }),

@@ -18,6 +18,7 @@ import type { Application } from '../../declarations'
 import { ItemService, getOptions } from './item.class'
 import { itemPath, itemMethods } from './item.shared'
 import { authorize } from 'feathers-casl'
+import { fileUpload } from '../../resolvers/files'
 
 export * from './item.class'
 export * from './item.schema'
@@ -35,7 +36,7 @@ export const items = (app: Application) => {
   app.service(itemPath).hooks({
     around: {
       all: [schemaHooks.resolveExternal(itemExternalResolver), schemaHooks.resolveResult(itemResolver)],
-      create: [authenticate('jwt'), authorize()],
+      create: [fileUpload('poster'), authenticate('jwt'), authorize()],
       patch: [authenticate('jwt'), authorize()],
       remove: [authenticate('jwt'), authorize()],
     },

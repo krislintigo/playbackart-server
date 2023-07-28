@@ -46,6 +46,7 @@
     "bundle:client": "npm run compile && npm pack --pack-destination ./public"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.379.1",
     "@casl/ability": "^6.5.0",
     "@feathersjs/adapter-commons": "5.0.8",
     "@feathersjs/authentication": "5.0.8",

@@ -3,8 +3,12 @@ import { feathers } from '@feathersjs/feathers'
 import type { TransportConnection, Application } from '@feathersjs/feathers'
 import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
+
+import { storageClient } from './services/storage/storage.shared'
 import { itemClient } from './services/item/item.shared'
 import { userClient } from './services/user/user.shared'
+
+export type { Storage, StorageData, StorageQuery, StoragePatch } from './services/storage/storage.shared'
 export type { Item, ItemData, ItemQuery, ItemPatch } from './services/item/item.shared'
 export type { User, UserData, UserQuery, UserPatch } from './services/user/user.shared'
 
@@ -36,5 +40,6 @@ export const createClient = <Configuration = any>(
 
   client.configure(userClient)
   client.configure(itemClient)
+  client.configure(storageClient)
   return client
 }
