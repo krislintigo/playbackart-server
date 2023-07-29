@@ -3,6 +3,7 @@ import { app } from '../src/app'
 import * as fs from 'fs/promises'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
+import { omit } from 'lodash'
 
 const argv = yargs(hideBin(process.argv)).argv as unknown as { userId: string }
 if (!argv.userId) throw new Error('Pass userId to command line!')
@@ -11,26 +12,12 @@ async function main() {
   const data = await fs.readFile('./api/result.json', 'utf8')
   const items = JSON.parse(data)
   const creations = items.map((item: any) => ({
-    name: item.name,
-    poster: item.poster || '',
-    rating: item.rating || 0,
-    status: item.status,
-    type: item.type,
-    restriction: item.restriction || '',
-    genres: item.genres || [],
-    time: {
-      count: item.time.count || 1,
-      duration: item.time.duration || 0,
-      replays: 0,
-    },
-    year: item.year || '',
-    developers: item.developers || [],
-    franchise: item.franchise || '',
-    userId: argv.userId,
+    ...omit(item, '_id'),
+    userId: item.userId || argv.userId,
   }))
   console.log(creations.length)
   await app.service('items').create(creations)
-  process.exit()
+  process.exit(0)
 }
 
 void main()

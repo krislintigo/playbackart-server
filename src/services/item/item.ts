@@ -18,6 +18,7 @@ import type { Application } from '../../declarations'
 import { ItemService, getOptions } from './item.class'
 import { itemPath, itemMethods } from './item.shared'
 import { authorize } from 'feathers-casl'
+import { clearAfterRemove, postersUpload } from '../../resolvers/files'
 
 export * from './item.class'
 export * from './item.schema'
@@ -35,8 +36,8 @@ export const items = (app: Application) => {
   app.service(itemPath).hooks({
     around: {
       all: [schemaHooks.resolveExternal(itemExternalResolver), schemaHooks.resolveResult(itemResolver)],
-      create: [authenticate('jwt'), authorize()],
-      patch: [authenticate('jwt'), authorize()],
+      create: [postersUpload, authenticate('jwt'), authorize()],
+      patch: [postersUpload, authenticate('jwt'), authorize()],
       remove: [authenticate('jwt'), authorize()],
     },
     before: {
@@ -52,6 +53,7 @@ export const items = (app: Application) => {
     },
     after: {
       all: [],
+      remove: [clearAfterRemove],
     },
     error: {
       all: [],
