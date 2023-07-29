@@ -34,6 +34,7 @@ app.configure(
     cors: {
       origin: app.get('origins'),
     },
+    maxHttpBufferSize: 1e8,
   }),
 )
 app.configure(feathersCasl({ defaultAdapter: '@feathersjs/mongodb' }))
@@ -58,6 +59,22 @@ app.hooks({
 app.hooks({
   setup: [],
   teardown: [],
+})
+
+app.use(async (ctx) => {
+  // S3 middleware
+  if (ctx.request.url.startsWith('/objects')) {
+    try {
+      const { file, headers, status } = await app
+        .service('storage')
+        .get(ctx.request.url.replace('/objects/', ''))
+      ctx.response.set(headers)
+      ctx.response.status = status
+      ctx.body = file
+    } catch (e) {
+      ctx.body = ''
+    }
+  }
 })
 
 export { app }

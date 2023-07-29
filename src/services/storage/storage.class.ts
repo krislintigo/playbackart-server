@@ -1,13 +1,22 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.class.html#custom-services
-import type { Id, NullableId, Params, ServiceInterface } from '@feathersjs/feathers'
+import type { Params, ServiceInterface } from '@feathersjs/feathers'
 
 import type { Application } from '../../declarations'
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import {
+  DeleteObjectsCommand,
+  GetObjectCommand,
+  ListObjectsV2Command,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3'
+import { get, isNil } from 'lodash'
+import dayjs from 'dayjs'
 
 type Storage = any
 interface StorageData {
   Key: string
   Body: any
+  ContentType: string
 }
 type StoragePatch = any
 type StorageQuery = any
@@ -44,22 +53,49 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
   //   return []
   // }
 
-  async get(id: Id, _params?: ServiceParams): Promise<Storage> {
-    return {
-      id: 0,
-      text: `A new message with ID: ${id}!`,
+  async get(id: string, _params?: ServiceParams): Promise<Storage> {
+    // Create the getCommand
+    const getCommand = new GetObjectCommand({
+      Bucket: this.bucket,
+      Key: id,
+    })
+    const result = await this.s3Client.send(getCommand)
+    const headers = {
+      'Accept-Ranges': result.AcceptRanges,
+      'Cache-Control': result.CacheControl,
+      Expires: result.Expires,
+      'Content-Disposition': result.ContentDisposition,
+      'Content-Encoding': result.ContentEncoding,
+      'Content-Language': result.ContentLanguage,
+      'Content-Length': result.ContentLength,
+      'Content-Range': result.ContentRange,
+      'Content-Type': result.ContentType,
+      ETag: result.ETag,
+      'Last-Modified': result.LastModified,
     }
+    const keys = Object.keys(headers) as Array<keyof typeof headers>
+    keys.forEach((key) => {
+      const value = headers[key]
+      if (isNil(value)) delete headers[key]
+      else if (value instanceof Date) {
+        // @ts-expect-error
+        headers[key] = dayjs(value).format('ddd, DD MMM YYYY HH:mm:ss [GMT]')
+      }
+    })
+    return { file: result.Body, headers, status: get(result, '$metadata.httpStatusCode', 200) }
+    // ctx.response.set(headers)
+    // ctx.response.status = get(result, '$metadata.httpStatusCode', 200)
+    // ctx.body = result.Body
   }
 
-  async create({ Key, Body }: StorageData, params?: ServiceParams): Promise<Storage> {
+  async create({ Key, Body, ContentType }: StorageData, params?: ServiceParams): Promise<Storage> {
     const command = new PutObjectCommand({
       Bucket: this.bucket,
       Key,
       Body,
-      // ContentType: 'plain/text',
+      ContentType,
     })
-    const res = await this.s3Client.send(command)
-    console.log(res)
+    return await this.s3Client.send(command)
   }
 
   // // This method has to be added to the 'methods' option to make it available to clients
@@ -78,11 +114,18 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
   //   }
   // }
 
-  async remove(id: NullableId, _params?: ServiceParams): Promise<Storage> {
-    return {
-      id: 0,
-      text: 'removed',
-    }
+  async remove(itemFolder: string, _params?: ServiceParams): Promise<Storage> {
+    const listParams = { Bucket: this.bucket, Prefix: itemFolder }
+    const listCommand = new ListObjectsV2Command(listParams)
+    const data = await this.s3Client.send(listCommand)
+    const objects = data.Contents
+    if (!objects?.length) return
+
+    const command = new DeleteObjectsCommand({
+      Bucket: this.bucket,
+      Delete: { Objects: objects.map((obj) => ({ Key: obj.Key })) },
+    })
+    return await this.s3Client.send(command)
   }
 }
 
