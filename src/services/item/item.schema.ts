@@ -23,7 +23,6 @@ const config = {
 
 const sharedData = {
   name: Type.String(),
-  // poster: Type.String(),
   poster: Type.Object(file),
   rating: Type.Number({ minimum: 0, maximum: 10 }),
   time: Type.Object({
