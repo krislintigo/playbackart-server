@@ -7,6 +7,11 @@ import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
 import { createdAndUpdatedAt } from '../common.schema'
 
+const tracked = Type.Object({
+  name: Type.String(),
+  description: Type.String(),
+})
+
 // Main data model schema
 export const userSchema = Type.Object(
   {
@@ -14,19 +19,11 @@ export const userSchema = Type.Object(
 
     login: Type.String(),
     password: Type.String(),
+
     list: Type.String(),
-    trackedDevelopers: Type.Array(
-      Type.Object({
-        name: Type.String(),
-        description: Type.String(),
-      }),
-    ),
-    trackedFranchises: Type.Array(
-      Type.Object({
-        name: Type.String(),
-        description: Type.String(),
-      }),
-    ),
+    trackedItems: Type.Array(tracked),
+    trackedDevelopers: Type.Array(tracked),
+    trackedFranchises: Type.Array(tracked),
 
     ...createdAndUpdatedAt,
   },
