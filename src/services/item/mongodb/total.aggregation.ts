@@ -6,7 +6,7 @@ export const totalAggregation = [
           { $multiply: ['$time.count', '$time.duration'] },
           {
             $reduce: {
-              input: '$seasons',
+              input: '$parts',
               initialValue: 0,
               in: {
                 $add: ['$$value', { $multiply: ['$$this.time.count', '$$this.time.duration'] }],
@@ -20,7 +20,7 @@ export const totalAggregation = [
           { $multiply: [{ $add: ['$time.replays', 1] }, '$time.count', '$time.duration'] },
           {
             $reduce: {
-              input: '$seasons',
+              input: '$parts',
               initialValue: 0,
               in: {
                 $add: [

@@ -2,7 +2,7 @@ export const ratingsAggregation = [
   {
     $addFields: {
       selectedRatings: {
-        $cond: [{ $eq: ['$config.seasons.multipleRatings', true] }, '$seasons.rating', ['$rating']],
+        $cond: [{ $eq: ['$config.parts.multipleRatings', true] }, '$parts.rating', ['$rating']],
       },
     },
   },

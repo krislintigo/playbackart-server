@@ -106,7 +106,7 @@ export const getOptions = (app: Application): MongoDBAdapterOptions => {
   }
 }
 
-// seasons: {
+// parts: {
 //   extended: boolean,
 //   multiplePosters: boolean,
 //   multipleRatings: boolean,
@@ -115,6 +115,11 @@ export const getOptions = (app: Application): MongoDBAdapterOptions => {
 
 interface Item2 {
   _id: string
+  config: {
+    parts: {
+      extended: boolean
+    }
+  }
   name: string
   poster: string
   rating: number
@@ -127,7 +132,7 @@ interface Item2 {
   developers: string[]
   genres: string[]
   franchise: string
-  seasons: Array<{
+  parts: Array<{
     name: string
     poster: string
     rating: number

@@ -26,9 +26,9 @@ export const postersUpload = async (ctx: HookContext, next: NextFunction) => {
   const service = ctx.path
   const uploads = [
     { file: ctx.data.poster, path: 'poster' },
-    ...(ctx.data.seasons?.map((season: any, i: number) => ({
+    ...(ctx.data.parts?.map((season: any, i: number) => ({
       file: season.poster,
-      path: `seasons.${i}.poster`,
+      path: `parts.${i}.poster`,
     })) || []),
   ]
     .filter(({ file }) => {

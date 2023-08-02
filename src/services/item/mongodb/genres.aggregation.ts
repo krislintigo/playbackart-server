@@ -6,10 +6,10 @@ export const genresAggregation = [
       ratings: {
         $push: {
           $cond: {
-            if: '$config.seasons.multipleRatings',
+            if: '$config.parts.multipleRatings',
             then: {
               $floor: {
-                $add: [{ $avg: '$seasons.rating' }, 0.5],
+                $add: [{ $avg: '$parts.rating' }, 0.5],
               },
             },
             else: '$rating',
@@ -21,21 +21,21 @@ export const genresAggregation = [
         $push: { $multiply: [{ $add: ['$time.replays', 1] }, '$time.count', '$time.duration'] },
       },
       count: { $sum: 1 },
-      seasonsDurations: {
+      partsDurations: {
         $push: {
           $map: {
-            // Формируем массив продолжительностей из полей seasons
-            input: '$seasons',
+            // Формируем массив продолжительностей из полей parts
+            input: '$parts',
             as: 'season',
             in: { $multiply: ['$$season.time.count', '$$season.time.duration'] },
           },
         },
       },
-      seasonsFullDurations: {
+      partsFullDurations: {
         $push: {
           $map: {
-            // Формируем массив продолжительностей из полей seasons
-            input: '$seasons',
+            // Формируем массив продолжительностей из полей parts
+            input: '$parts',
             as: 'season',
             in: {
               $multiply: [
@@ -57,8 +57,8 @@ export const genresAggregation = [
       durations: 1,
       fullDurations: 1,
       count: 1,
-      allDurations: { $concatArrays: ['$durations', '$seasonsDurations'] }, // Объединяем продолжительности из двух массивов
-      allFullDurations: { $concatArrays: ['$fullDurations', '$seasonsFullDurations'] },
+      allDurations: { $concatArrays: ['$durations', '$partsDurations'] }, // Объединяем продолжительности из двух массивов
+      allFullDurations: { $concatArrays: ['$fullDurations', '$partsFullDurations'] },
     },
   },
   // Сглаживаем массивы продолжительностей

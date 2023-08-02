@@ -9,7 +9,7 @@ import { createdAndUpdatedAt, file } from '../common.schema'
 import { resolveObjectId, resolveQueryObjectId } from '../../resolvers/objectId'
 
 const config = {
-  seasons: Type.Object({
+  parts: Type.Object({
     extended: Type.Boolean(),
     multiplePosters: Type.Boolean(),
     multipleRatings: Type.Boolean(),
@@ -49,7 +49,7 @@ export const itemSchema = Type.Object(
     restriction: StringEnum(['', 'G', 'PG', 'PG-13', 'R', 'NC-17']),
     genres: Type.Array(Type.String()),
     franchise: Type.String(),
-    seasons: Type.Array(Type.Object(sharedData)),
+    parts: Type.Array(Type.Object(sharedData)),
 
     ...createdAndUpdatedAt,
   },
