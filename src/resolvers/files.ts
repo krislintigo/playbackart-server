@@ -1,16 +1,7 @@
 import { type HookContext } from '../declarations'
 import { type NextFunction } from '@feathersjs/feathers'
 import { v4 as uuid } from 'uuid'
-
-export const returnObjectByPath = (from: any, path: string) => {
-  const fields = path.split('.')
-  let returned = from
-  for (const field of fields) {
-    if (!returned) return
-    returned = returned[field]
-  }
-  return returned
-}
+import { get } from 'lodash'
 
 export const getMimeType = (input: string) => {
   const startMarker = 'data:'
@@ -22,7 +13,6 @@ export const getMimeType = (input: string) => {
 }
 
 export const postersUpload = async (ctx: HookContext, next: NextFunction) => {
-  console.log('DATA', ctx.data)
   const service = ctx.path
   const uploads = [
     { file: ctx.data.poster, path: 'poster' },
@@ -61,16 +51,13 @@ export const postersUpload = async (ctx: HookContext, next: NextFunction) => {
   //   })
   // }
 
-  console.log(uploads)
-
   await next()
 
-  console.time('save aws')
   await Promise.all(
     uploads.map(async (file) => {
       const instanceId = ctx.result._id as string
       const Key = `${service}/${instanceId}/${file.instanceKey}`
-      const afterFile = returnObjectByPath(ctx.result, file.path)
+      const afterFile = get(ctx.result, file.path)
       afterFile.key = Key
       // single create for all uploads
       await ctx.app.service('storage').create({
@@ -83,11 +70,11 @@ export const postersUpload = async (ctx: HookContext, next: NextFunction) => {
       })
     }),
   )
-  console.timeEnd('save aws')
 }
 
 export const clearAfterRemove = async (ctx: HookContext) => {
   const service = ctx.path
-  const instanceId = ctx.result._id as string
+  const instanceId = ctx.id as string
+  console.log(instanceId)
   await ctx.app.service('storage').remove(`${service}/${instanceId}`)
 }

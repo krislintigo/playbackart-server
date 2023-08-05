@@ -83,9 +83,6 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
       }
     })
     return { file: result.Body, headers, status: get(result, '$metadata.httpStatusCode', 200) }
-    // ctx.response.set(headers)
-    // ctx.response.status = get(result, '$metadata.httpStatusCode', 200)
-    // ctx.body = result.Body
   }
 
   async create({ Key, Body, ContentType }: StorageData, params?: ServiceParams): Promise<Storage> {
@@ -98,32 +95,18 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
     return await this.s3Client.send(command)
   }
 
-  // // This method has to be added to the 'methods' option to make it available to clients
-  // async update(id: NullableId, data: StorageData, _params?: ServiceParams): Promise<Storage> {
-  //   return {
-  //     id: 0,
-  //     ...data,
-  //   }
-  // }
-
-  // async patch(id: NullableId, data: StoragePatch, _params?: ServiceParams): Promise<Storage> {
-  //   return {
-  //     id: 0,
-  //     text: `Fallback for ${id}`,
-  //     ...data,
-  //   }
-  // }
-
   async remove(itemFolder: string, _params?: ServiceParams): Promise<Storage> {
-    const listParams = { Bucket: this.bucket, Prefix: itemFolder }
-    const listCommand = new ListObjectsV2Command(listParams)
+    const listCommand = new ListObjectsV2Command({
+      Bucket: this.bucket,
+      Prefix: itemFolder,
+    })
     const data = await this.s3Client.send(listCommand)
     const objects = data.Contents
     if (!objects?.length) return
 
     const command = new DeleteObjectsCommand({
       Bucket: this.bucket,
-      Delete: { Objects: objects.map((obj) => ({ Key: obj.Key })) },
+      Delete: { Quiet: false, Objects: objects.map((obj) => ({ Key: obj.Key })) },
     })
     return await this.s3Client.send(command)
   }
