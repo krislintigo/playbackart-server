@@ -46,7 +46,7 @@ export const items = (app: Application) => {
         // schemaHooks.validateQuery(itemQueryValidator),
         schemaHooks.resolveQuery(itemQueryResolver),
       ],
-      find: [timeSort],
+      // find: [timeSort],
       get: [],
       create: [schemaHooks.validateData(itemDataValidator), schemaHooks.resolveData(itemDataResolver)],
       patch: [schemaHooks.validateData(itemPatchValidator), schemaHooks.resolveData(itemPatchResolver)],
