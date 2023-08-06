@@ -3,9 +3,11 @@ import type { Params, ServiceInterface } from '@feathersjs/feathers'
 
 import type { Application } from '../../declarations'
 import {
+  CopyObjectCommand,
   DeleteObjectsCommand,
   GetObjectCommand,
   ListObjectsV2Command,
+  type PutObjectAclCommandOutput,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3'
@@ -85,12 +87,24 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
     return { file: result.Body, headers, status: get(result, '$metadata.httpStatusCode', 200) }
   }
 
-  async create({ Key, Body, ContentType }: StorageData, params?: ServiceParams): Promise<Storage> {
+  async create(
+    { Key, Body, ContentType }: StorageData,
+    params?: ServiceParams,
+  ): Promise<PutObjectAclCommandOutput> {
     const command = new PutObjectCommand({
       Bucket: this.bucket,
       Key,
       Body,
       ContentType,
+    })
+    return await this.s3Client.send(command)
+  }
+
+  async copy({ source, Key }: { source: string; Key: string }) {
+    const command = new CopyObjectCommand({
+      Bucket: this.bucket,
+      CopySource: `/${this.bucket}/${source}`,
+      Key,
     })
     return await this.s3Client.send(command)
   }
@@ -103,6 +117,7 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
     const data = await this.s3Client.send(listCommand)
     const objects = data.Contents
     if (!objects?.length) return
+    console.log('delete:', objects)
 
     const command = new DeleteObjectsCommand({
       Bucket: this.bucket,

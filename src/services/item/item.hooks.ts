@@ -1,6 +1,6 @@
 import { type HookContext } from '../../declarations'
 
-export const timeSort = (ctx: HookContext) => {
+export const timeSort = async (ctx: HookContext) => {
   const timeSort: number | undefined = ctx.params.query.$sort?.time
   if (!timeSort) return
   const pipeline = ctx.app.service('items').makeFeathersPipeline(ctx.params)
