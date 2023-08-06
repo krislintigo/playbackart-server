@@ -101,7 +101,7 @@ export const getOptions = (app: Application): MongoDBAdapterOptions => {
   return {
     paginate: app.get('paginate'),
     Model: app.get('mongodbClient').then((db) => db.collection('items')),
-    operators: ['$regex', '$options'],
+    operators: ['$regex', '$options', '$all'],
     multi: ['create'],
   }
 }
