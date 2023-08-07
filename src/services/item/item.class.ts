@@ -12,6 +12,31 @@ import { restrictionsAggregation } from './mongodb/restrictions.aggregation'
 import { ratingsAggregation } from './mongodb/ratings.aggregation'
 export type { Item, ItemData, ItemPatch, ItemQuery }
 
+export interface SimpleStatistic<T> {
+  value: T
+  count: number
+}
+
+export interface ExtendedStatistic<T> extends SimpleStatistic<T> {
+  ratings: number[]
+  durations: number[]
+  fullDurations: number[]
+}
+
+export interface FiltersOutput {
+  ratings: Array<SimpleStatistic<number>>
+  restrictions: Array<SimpleStatistic<number>>
+  genres: Array<ExtendedStatistic<string>>
+  developers: Array<ExtendedStatistic<string>>
+  franchises: Array<ExtendedStatistic<string>>
+  total: Array<{
+    status: Item['status']
+    count: number
+    duration: number
+    fullDuration: number
+  }>
+}
+
 export interface ItemParams extends MongoDBAdapterParams<ItemQuery> {}
 
 // By default calls the standard MongoDB adapter service methods but can be customized with your own functionality.
@@ -24,43 +49,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
   async filters(
     { userId, type }: { userId: string | undefined; type: Item['type'] | undefined },
     _params?: ServiceParams,
-  ): Promise<{
-    ratings: Array<{
-      value: number
-      count: number
-    }>
-    restrictions: Array<{
-      value: string
-      count: number
-    }>
-    genres: Array<{
-      value: string
-      ratings: number[]
-      durations: number[]
-      fullDurations: number[]
-      count: number
-    }>
-    developers: Array<{
-      value: string
-      ratings: number[]
-      durations: number[]
-      fullDurations: number[]
-      count: number
-    }>
-    franchises: Array<{
-      value: string
-      ratings: number[]
-      durations: number[]
-      fullDurations: number[]
-      count: number
-    }>
-    total: Array<{
-      status: Item['status']
-      count: number
-      duration: number
-      fullDuration: number[]
-    }>
-  }> {
+  ): Promise<FiltersOutput> {
     if (!userId) throw new Error('No userId provided')
 
     const result = (await this.find({

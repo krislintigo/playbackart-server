@@ -12,6 +12,8 @@ export type { Storage, StorageData, StorageQuery, StoragePatch } from './service
 export type { Item, ItemData, ItemQuery, ItemPatch } from './services/item/item.shared'
 export type { User, UserData, UserQuery, UserPatch } from './services/user/user.shared'
 
+export type { SimpleStatistic, ExtendedStatistic, FiltersOutput } from './services/item/item.class'
+
 export interface Configuration {
   connection: TransportConnection<ServiceTypes>
 }
