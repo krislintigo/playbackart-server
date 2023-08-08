@@ -137,6 +137,5 @@ export const clearAfterRemove = async (ctx: HookContext) => {
     .service('storage')
     .find({ Prefix: `${service}/${instanceId}` })
   if (!removables?.length) return
-  console.log('delete:', removables)
   await ctx.app.service('storage').remove(removables.map((i) => i.Key as string))
 }
