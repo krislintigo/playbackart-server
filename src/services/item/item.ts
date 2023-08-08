@@ -18,7 +18,7 @@ import type { Application } from '../../declarations'
 import { ItemService, getOptions } from './item.class'
 import { itemPath, itemMethods } from './item.shared'
 import { authorize } from 'feathers-casl'
-import { clearAfterRemove, postersUpload } from '../../resolvers/files'
+import { clearAfterPatch, clearAfterRemove, postersUpload } from '../../resolvers/files'
 import { timeSort } from './item.hooks'
 
 export * from './item.class'

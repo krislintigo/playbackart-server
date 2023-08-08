@@ -61,9 +61,9 @@ export const postersUpload = async (ctx: HookContext, next: NextFunction) => {
     delete file.action
   })
 
-  console.log(files)
-  console.log(uploads)
-  console.log(copies)
+  // console.log(files)
+  // console.log(uploads)
+  // console.log(copies)
 
   // remove old image if exists
   // if (ctx.method === 'patch') {
@@ -111,10 +111,32 @@ export const postersUpload = async (ctx: HookContext, next: NextFunction) => {
       })
     }),
   )
+
+  if (ctx.method === 'patch') void clearAfterPatch(ctx)
+}
+
+export const clearAfterPatch = async (ctx: HookContext) => {
+  if (!ctx.data.poster && !ctx.data.parts) return
+  const service = ctx.path
+  const instanceId = ctx.id as string
+  const { Contents: data } = await ctx.app.service('storage').find({ Prefix: `${service}/${instanceId}` })
+  if (!data?.length) return
+  const allData = data.map((i) => i.Key).filter(Boolean) as string[]
+  const usedData = [ctx.result.poster.key, ...ctx.result.parts.map((p: any) => p.poster.key)].filter(
+    Boolean,
+  ) as string[]
+  const removables = allData.filter((i) => !usedData.includes(i))
+  if (!removables.length) return
+  await ctx.app.service('storage').remove(removables)
 }
 
 export const clearAfterRemove = async (ctx: HookContext) => {
   const service = ctx.path
   const instanceId = ctx.id as string
-  await ctx.app.service('storage').remove(`${service}/${instanceId}`)
+  const { Contents: removables } = await ctx.app
+    .service('storage')
+    .find({ Prefix: `${service}/${instanceId}` })
+  if (!removables?.length) return
+  console.log('delete:', removables)
+  await ctx.app.service('storage').remove(removables.map((i) => i.Key as string))
 }

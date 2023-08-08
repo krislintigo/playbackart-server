@@ -32,9 +32,7 @@ export interface StorageServiceOptions {
 export interface StorageParams extends Params<StorageQuery> {}
 
 // This is a skeleton for a custom service class. Remove or add the methods you need here
-export class StorageService<ServiceParams extends StorageParams = StorageParams>
-  implements ServiceInterface<Storage, StorageData, ServiceParams, StoragePatch>
-{
+export class StorageService<ServiceParams extends StorageParams = StorageParams> {
   private readonly s3Client: S3Client
   private readonly bucket: string
   constructor(public options: StorageServiceOptions) {
@@ -50,10 +48,6 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
     })
     this.bucket = process.env.S3_BUCKET as string
   }
-
-  // async find(_params?: ServiceParams): Promise<Storage[]> {
-  //   return []
-  // }
 
   async get(id: string, _params?: ServiceParams): Promise<Storage> {
     // Create the getCommand
@@ -89,7 +83,7 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
 
   async create(
     { Key, Body, ContentType }: StorageData,
-    params?: ServiceParams,
+    _params?: ServiceParams,
   ): Promise<PutObjectAclCommandOutput> {
     const command = new PutObjectCommand({
       Bucket: this.bucket,
@@ -100,7 +94,15 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
     return await this.s3Client.send(command)
   }
 
-  async copy({ source, Key }: { source: string; Key: string }) {
+  async find({ Prefix }: { Prefix: string }, _params?: ServiceParams) {
+    const listCommand = new ListObjectsV2Command({
+      Bucket: this.bucket,
+      Prefix,
+    })
+    return await this.s3Client.send(listCommand)
+  }
+
+  async copy({ source, Key }: { source: string; Key: string }, _params?: ServiceParams) {
     const command = new CopyObjectCommand({
       Bucket: this.bucket,
       CopySource: `/${this.bucket}/${source}`,
@@ -109,19 +111,10 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
     return await this.s3Client.send(command)
   }
 
-  async remove(itemFolder: string, _params?: ServiceParams): Promise<Storage> {
-    const listCommand = new ListObjectsV2Command({
-      Bucket: this.bucket,
-      Prefix: itemFolder,
-    })
-    const data = await this.s3Client.send(listCommand)
-    const objects = data.Contents
-    if (!objects?.length) return
-    console.log('delete:', objects)
-
+  async remove(keys: string[], _params?: ServiceParams) {
     const command = new DeleteObjectsCommand({
       Bucket: this.bucket,
-      Delete: { Quiet: false, Objects: objects.map((obj) => ({ Key: obj.Key })) },
+      Delete: { Quiet: false, Objects: keys.map((key) => ({ Key: key })) },
     })
     return await this.s3Client.send(command)
   }
