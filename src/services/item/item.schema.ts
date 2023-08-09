@@ -32,6 +32,7 @@ const sharedData = {
   }),
   year: Type.String(),
   developers: Type.Array(Type.String()),
+  status: StringEnum(['in-process', 'planned', 'completed', 'postponed', 'abandoned']),
 }
 
 export const itemSchema = Type.Object(
@@ -42,14 +43,14 @@ export const itemSchema = Type.Object(
 
     config: Type.Object(config),
 
-    status: StringEnum(['in-process', 'planned', 'completed', 'postponed', 'abandoned']),
+    // status: StringEnum(['in-process', 'planned', 'completed', 'postponed', 'abandoned']),
     type: StringEnum(['movie', 'series', 'game', 'book']),
-
-    ...sharedData,
     restriction: StringEnum(['', 'G', 'PG', 'PG-13', 'R', 'NC-17']),
     genres: Type.Array(Type.String()),
     franchise: Type.String(),
     parts: Type.Array(Type.Object(sharedData)),
+
+    ...sharedData,
 
     ...createdAndUpdatedAt,
   },
