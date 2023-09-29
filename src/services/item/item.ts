@@ -60,6 +60,39 @@ export const items = (app: Application) => {
       all: [],
     },
   })
+
+  setTimeout(async () => {
+    // for (const i of ['1', '2', '3', '4', '5']) {
+    //   console.time('filters 1 (small), iteration ' + i)
+    //   await app.service('items').filters({ userId: '647756288c4529458af2656e', type: undefined })
+    //   console.timeEnd('filters 1 (small), iteration ' + i)
+    // }
+    //
+    // console.log()
+    //
+    // for (const i of ['1', '2', '3', '4', '5']) {
+    //   console.time('filters 2 (small), iteration ' + i)
+    //   await app.service('items').filters2({ userId: '647756288c4529458af2656e', type: undefined })
+    //   console.timeEnd('filters 2 (small), iteration ' + i)
+    // }
+    //
+    // console.log()
+    //
+    // for (const i of ['1', '2', '3', '4', '5']) {
+    //   console.time('filters 1 (huge), iteration ' + i)
+    //   await app.service('items').filters({ userId: '6474e01af873f22f6090936d', type: undefined })
+    //   console.timeEnd('filters 1 (huge), iteration ' + i)
+    // }
+    //
+    // console.log()
+
+    for (const i of ['1']) {
+      console.time('filters 2 (huge), iteration ' + i)
+      await app.service('items').filters2({ userId: '6474e01af873f22f6090936d', type: undefined })
+      console.timeEnd('filters 2 (huge), iteration ' + i)
+      console.log()
+    }
+  }, 500)
 }
 
 // Add this service to the service type index
