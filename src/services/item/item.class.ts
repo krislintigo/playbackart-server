@@ -27,18 +27,20 @@ export interface ExtendedStatistic<T> extends SimpleStatistic<T> {
   }>
 }
 
+export interface TotalStatistic {
+  status: Item['status']
+  count: number
+  duration: number
+  fullDuration: number
+}
+
 export interface FiltersOutput {
   ratings: Array<SimpleStatistic<number>>
-  restrictions: Array<SimpleStatistic<number>>
+  restrictions: Array<SimpleStatistic<Item['restriction']>>
   genres: Array<ExtendedStatistic<string>>
   developers: Array<ExtendedStatistic<string>>
   franchises: Array<ExtendedStatistic<string>>
-  total: Array<{
-    status: Item['status']
-    count: number
-    duration: number
-    fullDuration: number
-  }>
+  total: TotalStatistic[]
 }
 
 export interface ItemParams extends MongoDBAdapterParams<ItemQuery> {}
@@ -92,7 +94,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
   async filters(
     { userId, type }: { userId: string | undefined; type?: Item['type'] },
     _params?: ServiceParams,
-  ) {
+  ): Promise<FiltersOutput> {
     const items = await this.find({
       query: {
         ...(type && { type }),
@@ -127,24 +129,27 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
     const DEFAULT_SIMPLE_STATISTICS = {
       count: 0,
     }
-
     const DEFAULT_EXTENDED_STATISTICS: Omit<ExtendedStatistic<string>, 'value'> = {
       coefficient: 0,
       count: 0,
       items: [],
     }
+    const DEFAULT_TOTAL_STATISTICS: Omit<TotalStatistic, 'status'> = {
+      count: 0,
+      duration: 0,
+      fullDuration: 0,
+    }
 
     const ratingsMap = new Map<number, Omit<SimpleStatistic<number>, 'value'>>()
-    const restrictionsMap = new Map<string, Omit<SimpleStatistic<string>, 'value'>>()
+    const restrictionsMap = new Map<
+      Item['restriction'],
+      Omit<SimpleStatistic<Item['restriction']>, 'value'>
+    >()
     const genresMap = new Map<string, Omit<ExtendedStatistic<string>, 'value'>>()
     const developersMap = new Map<string, Omit<ExtendedStatistic<string>, 'value'>>()
     const franchisesMap = new Map<string, Omit<ExtendedStatistic<string>, 'value'>>()
-    const totalMap = new Map(
-      ['in-process', 'planned', 'completed', 'postponed', 'abandoned'].map((i) => [
-        i,
-        { count: 0, duration: 0, fullDuration: 0 },
-      ]),
-    )
+    const totalMap = new Map<Item['status'], Omit<TotalStatistic, 'status'>>()
+
     for (const item of items) {
       const fullParts = [item, ...item.parts] as Item[]
       // ratings
@@ -220,7 +225,8 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       // total
       for (const part of fullParts) {
         const status = part.status
-        const currentStatus = totalMap.get(status)
+        const currentStatus =
+          totalMap.get(status) ?? totalMap.set(status, cloneDeep(DEFAULT_TOTAL_STATISTICS)).get(status)
         if (currentStatus) {
           currentStatus.duration += computeDuration(part, { includeParts: false })
           currentStatus.fullDuration += computeDuration(part, { full: true, includeParts: false })
@@ -228,15 +234,12 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       }
     }
 
-    const arrayFromMap = <A, B>(map: Map<A, B>, variableName = 'value') =>
-      [...map.entries()].map(([value, data]) => ({ [variableName]: value, ...data }))
-
-    const ratings = arrayFromMap(ratingsMap) // done
-    const restrictions = arrayFromMap(restrictionsMap) // done
-    const genres = arrayFromMap(genresMap) // done
-    const developers = arrayFromMap(developersMap) // done
-    const franchises = arrayFromMap(franchisesMap) // done
-    const total = arrayFromMap(totalMap, 'status') // done
+    const ratings = [...ratingsMap.entries()].map(([value, data]) => ({ value, ...data }))
+    const restrictions = [...restrictionsMap.entries()].map(([value, data]) => ({ value, ...data }))
+    const genres = [...genresMap.entries()].map(([value, data]) => ({ value, ...data }))
+    const developers = [...developersMap.entries()].map(([value, data]) => ({ value, ...data }))
+    const franchises = [...franchisesMap.entries()].map(([value, data]) => ({ value, ...data }))
+    const total = [...totalMap.entries()].map(([status, data]) => ({ status, ...data }))
 
     const totalDuration = total.reduce((acc, cur) => acc + cur.duration, 0)
     for (const genre of genres) {
@@ -258,7 +261,6 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
           .reduce((acc, cur) => acc + cur, 0) / totalDuration
     }
 
-    // console.dir(JSON.stringify(developers, null, 2))
     return { ratings, restrictions, genres, developers, franchises, total }
   }
 }
