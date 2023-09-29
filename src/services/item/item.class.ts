@@ -233,7 +233,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
     const genres = arrayFromMap(genresMap) // done
     const developers = arrayFromMap(developersMap) // done
     const franchises = arrayFromMap(franchisesMap) // done
-    const total = arrayFromMap(totalMap)
+    const total = arrayFromMap(totalMap) // done
     // console.timeEnd('js')
     const response = { ratings, restrictions, genres, developers, franchises, total }
     console.dir(JSON.stringify(response, null, 2))
