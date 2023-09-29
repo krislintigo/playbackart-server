@@ -4,13 +4,7 @@ import { MongoDBService } from '@feathersjs/mongodb'
 import type { MongoDBAdapterParams, MongoDBAdapterOptions } from '@feathersjs/mongodb'
 import type { Application } from '../../declarations'
 import { type Item, type ItemData, type ItemPatch, type ItemQuery } from './item.schema'
-import { totalAggregation } from './mongodb/total.aggregation'
-import { franchisesAggregation } from './mongodb/franchises.aggregation'
-import { developersAggregation } from './mongodb/developers.aggregation'
-import { genresAggregation } from './mongodb/genres.aggregation'
-import { restrictionsAggregation } from './mongodb/restrictions.aggregation'
-import { ratingsAggregation } from './mongodb/ratings.aggregation'
-import { cloneDeep, includes, values } from 'lodash'
+import { cloneDeep } from 'lodash'
 export type { Item, ItemData, ItemPatch, ItemQuery }
 
 export interface SimpleStatistic<T> {
@@ -52,44 +46,44 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
   ItemParams,
   ItemPatch
 > {
-  async filters_old(
-    { userId, type }: { userId: string | undefined; type?: Item['type'] },
-    _params?: ServiceParams,
-  ): Promise<FiltersOutput> {
-    if (!userId) throw new Error('No userId provided')
-
-    const result = (await this.find({
-      query: {
-        ...(type && { type }),
-        userId,
-      },
-      pipeline: [
-        {
-          $facet: {
-            ratings: ratingsAggregation,
-            restrictions: restrictionsAggregation,
-            genres: genresAggregation,
-            developers: developersAggregation,
-            franchises: franchisesAggregation,
-            total: totalAggregation,
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            ratings: 1,
-            restrictions: 1,
-            genres: 1,
-            developers: 1,
-            franchises: 1,
-            total: 1,
-          },
-        },
-      ],
-      paginate: false,
-    })) as any
-    return result.at(0)
-  }
+  // async filters_old(
+  //   { userId, type }: { userId: string | undefined; type?: Item['type'] },
+  //   _params?: ServiceParams,
+  // ): Promise<FiltersOutput> {
+  //   if (!userId) throw new Error('No userId provided')
+  //
+  //   const result = (await this.find({
+  //     query: {
+  //       ...(type && { type }),
+  //       userId,
+  //     },
+  //     pipeline: [
+  //       {
+  //         $facet: {
+  //           ratings: ratingsAggregation,
+  //           restrictions: restrictionsAggregation,
+  //           genres: genresAggregation,
+  //           developers: developersAggregation,
+  //           franchises: franchisesAggregation,
+  //           total: totalAggregation,
+  //         },
+  //       },
+  //       {
+  //         $project: {
+  //           _id: 0,
+  //           ratings: 1,
+  //           restrictions: 1,
+  //           genres: 1,
+  //           developers: 1,
+  //           franchises: 1,
+  //           total: 1,
+  //         },
+  //       },
+  //     ],
+  //     paginate: false,
+  //   })) as any
+  //   return result.at(0)
+  // }
 
   async filters(
     { userId, type }: { userId: string | undefined; type?: Item['type'] },
