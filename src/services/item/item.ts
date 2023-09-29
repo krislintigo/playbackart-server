@@ -19,7 +19,7 @@ import { ItemService, getOptions } from './item.class'
 import { itemPath, itemMethods } from './item.shared'
 import { authorize } from 'feathers-casl'
 import { clearAfterPatch, clearAfterRemove, postersUpload } from '../../resolvers/files'
-import { timeSort } from './item.hooks'
+import { $sort } from './item.hooks'
 
 export * from './item.class'
 export * from './item.schema'
@@ -46,7 +46,7 @@ export const items = (app: Application) => {
         // schemaHooks.validateQuery(itemQueryValidator),
         schemaHooks.resolveQuery(itemQueryResolver),
       ],
-      // find: [timeSort],
+      find: [$sort],
       get: [],
       create: [schemaHooks.validateData(itemDataValidator), schemaHooks.resolveData(itemDataResolver)],
       patch: [schemaHooks.validateData(itemPatchValidator), schemaHooks.resolveData(itemPatchResolver)],

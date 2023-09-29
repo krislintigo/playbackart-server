@@ -61,18 +61,6 @@ export const postersUpload = async (ctx: HookContext, next: NextFunction) => {
     delete file.action
   })
 
-  // console.log(files)
-  // console.log(uploads)
-  // console.log(copies)
-
-  // remove old image if exists
-  // if (ctx.method === 'patch') {
-  //   ctx.service._get(ctx.id).then((item: any) => {
-  //     const fileToRemove = returnObjectByPath(item, path)
-  //     void ctx.app.service('aws-s3').remove(fileToRemove.key)
-  //   })
-  // }
-
   await next()
 
   const instanceId = ctx.result._id as string
