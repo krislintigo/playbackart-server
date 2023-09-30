@@ -4,7 +4,7 @@ import { MongoDBService } from '@feathersjs/mongodb'
 import type { MongoDBAdapterParams, MongoDBAdapterOptions } from '@feathersjs/mongodb'
 import type { Application } from '../../declarations'
 import { type Item, type ItemData, type ItemPatch, type ItemQuery } from './item.schema'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, omit } from 'lodash'
 export type { Item, ItemData, ItemPatch, ItemQuery }
 
 export interface SimpleStatistic<T> {
@@ -12,7 +12,7 @@ export interface SimpleStatistic<T> {
   count: number
 }
 
-export interface ExtendedStatistic<T> extends SimpleStatistic<T> {
+interface ExtendedStatisticInput<T> extends SimpleStatistic<T> {
   coefficient: number
   items: Array<{
     rating: number
@@ -20,6 +20,8 @@ export interface ExtendedStatistic<T> extends SimpleStatistic<T> {
     fullDuration: number
   }>
 }
+
+export type ExtendedStatistic<T> = Omit<ExtendedStatisticInput<T>, 'items'>
 
 export interface TotalStatistic {
   status: Item['status']
@@ -123,7 +125,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
     const DEFAULT_SIMPLE_STATISTICS = {
       count: 0,
     }
-    const DEFAULT_EXTENDED_STATISTICS: Omit<ExtendedStatistic<string>, 'value'> = {
+    const DEFAULT_EXTENDED_STATISTICS: Omit<ExtendedStatisticInput<string>, 'value'> = {
       coefficient: 0,
       count: 0,
       items: [],
@@ -139,9 +141,9 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       Item['restriction'],
       Omit<SimpleStatistic<Item['restriction']>, 'value'>
     >()
-    const genresMap = new Map<string, Omit<ExtendedStatistic<string>, 'value'>>()
-    const developersMap = new Map<string, Omit<ExtendedStatistic<string>, 'value'>>()
-    const franchisesMap = new Map<string, Omit<ExtendedStatistic<string>, 'value'>>()
+    const genresMap = new Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>()
+    const developersMap = new Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>()
+    const franchisesMap = new Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>()
     const totalMap = new Map<Item['status'], Omit<TotalStatistic, 'status'>>()
 
     for (const item of items) {
@@ -236,37 +238,32 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       if (mainStatus) mainStatus.count++
     }
 
-    // const computeCoefficients_map = (map: Map<string, Omit<ExtendedStatistic<string>, 'value'>>) => {
-    //   map.forEach((item) => {
-    //     item.coefficient =
-    //       item.items
-    //         .map((i) => i.fullDuration * ratingCoefficient(i.rating))
-    //         .reduce((acc, cur) => acc + cur, 0) / totalDuration
-    //   })
-    // }
-
-    const ratings = [...ratingsMap.entries()].map(([value, data]) => ({ value, ...data }))
-    const restrictions = [...restrictionsMap.entries()].map(([value, data]) => ({ value, ...data }))
-    const genres = [...genresMap.entries()].map(([value, data]) => ({ value, ...data }))
-    const developers = [...developersMap.entries()].map(([value, data]) => ({ value, ...data }))
-    const franchises = [...franchisesMap.entries()].map(([value, data]) => ({ value, ...data }))
-    const total = [...totalMap.entries()].map(([status, data]) => ({ status, ...data }))
-
-    const computeCoefficients = (items: Array<ExtendedStatistic<string>>) => {
-      for (const item of items) {
+    const totalDuration = [...totalMap.values()].reduce((acc, cur) => acc + cur.duration, 0)
+    const computeCoefficients = (map: Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>) => {
+      map.forEach((item) => {
         item.coefficient =
           item.items
             .map((i) => i.fullDuration * ratingCoefficient(i.rating))
             .reduce((acc, cur) => acc + cur, 0) / totalDuration
-      }
+      })
     }
 
-    const totalDuration = total.reduce((acc, cur) => acc + cur.duration, 0)
-    computeCoefficients(genres)
-    computeCoefficients(developers)
-    computeCoefficients(franchises)
+    computeCoefficients(genresMap)
+    computeCoefficients(developersMap)
+    computeCoefficients(franchisesMap)
 
-    // console.log(franchises[0].items)
+    const ratings = [...ratingsMap.entries()].map(([value, data]) => ({ value, ...data }))
+    const restrictions = [...restrictionsMap.entries()].map(([value, data]) => ({ value, ...data }))
+    const genres = [...genresMap.entries()].map(([value, data]) => ({ value, ...omit(data, 'items') }))
+    const developers = [...developersMap.entries()].map(([value, data]) => ({
+      value,
+      ...omit(data, 'items'),
+    }))
+    const franchises = [...franchisesMap.entries()].map(([value, data]) => ({
+      value,
+      ...omit(data, 'items'),
+    }))
+    const total = [...totalMap.entries()].map(([status, data]) => ({ status, ...data }))
 
     return { ratings, restrictions, genres, developers, franchises, total }
   }
