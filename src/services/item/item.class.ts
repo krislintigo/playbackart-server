@@ -100,15 +100,8 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       paginate: false,
     })
 
-    const computeDuration = (
-      item: Item,
-      { full = false, includeParts = false }: { full?: boolean; includeParts?: boolean },
-    ) => {
-      const part = (i: Item['time']) => (full ? i.replays + 1 : 1) * i.count * i.duration
-
-      return (
-        part(item.time) + (includeParts ? item.parts?.reduce((acc, cur) => acc + part(cur.time), 0) ?? 0 : 0)
-      )
+    const computeDuration = (item: Item, full = false) => {
+      return (full ? item.time.replays + 1 : 1) * item.time.count * item.time.duration
     }
 
     const ratingCoefficient = (rating: number) => {
@@ -177,8 +170,8 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
             if (!rating) continue
             currentGenre.items.push({
               rating,
-              duration: computeDuration(part, {}),
-              fullDuration: computeDuration(part, { full: true }),
+              duration: computeDuration(part),
+              fullDuration: computeDuration(part, true),
             })
           }
         }
@@ -199,8 +192,8 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
             if (!rating || !partIncludesDeveloper) continue
             currentDeveloper.items.push({
               rating,
-              duration: computeDuration(part, {}),
-              fullDuration: computeDuration(part, { full: true }),
+              duration: computeDuration(part),
+              fullDuration: computeDuration(part, true),
             })
           }
         }
@@ -218,8 +211,8 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
             if (!rating) continue
             currentFranchise.items.push({
               rating,
-              duration: computeDuration(part, {}),
-              fullDuration: computeDuration(part, { full: true }),
+              duration: computeDuration(part),
+              fullDuration: computeDuration(part, true),
             })
           }
         }
@@ -230,8 +223,8 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
         const currentStatus =
           totalMap.get(status) ?? totalMap.set(status, cloneDeep(DEFAULT_TOTAL_STATISTICS)).get(status)
         if (currentStatus) {
-          currentStatus.duration += computeDuration(part, { includeParts: false })
-          currentStatus.fullDuration += computeDuration(part, { full: true, includeParts: false })
+          currentStatus.duration += computeDuration(part)
+          currentStatus.fullDuration += computeDuration(part, true)
         }
       }
       const mainStatus = totalMap.get(item.status)
