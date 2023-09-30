@@ -152,11 +152,13 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       }
       // restrictions
       const restriction = item.restriction
-      const currentRestriction =
-        restrictionsMap.get(restriction) ??
-        restrictionsMap.set(restriction, cloneDeep(DEFAULT_SIMPLE_STATISTICS)).get(restriction)
-      if (currentRestriction) {
-        currentRestriction.count++
+      if (restriction) {
+        const currentRestriction =
+          restrictionsMap.get(restriction) ??
+          restrictionsMap.set(restriction, cloneDeep(DEFAULT_SIMPLE_STATISTICS)).get(restriction)
+        if (currentRestriction) {
+          currentRestriction.count++
+        }
       }
       // genres
       const genres = item.genres
