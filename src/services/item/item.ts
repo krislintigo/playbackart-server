@@ -19,7 +19,7 @@ import { ItemService, getOptions } from './item.class'
 import { itemPath, itemMethods } from './item.shared'
 import { authorize } from 'feathers-casl'
 import { clearAfterPatch, clearAfterRemove, postersUpload } from '../../resolvers/files'
-import { $sort } from './item.hooks'
+import { $sort, emitCUD } from './item.hooks'
 
 export * from './item.class'
 export * from './item.schema'
@@ -31,7 +31,7 @@ export const items = (app: Application) => {
     // A list of all methods this service exposes externally
     methods: itemMethods,
     // You can add additional custom events to be sent to clients here
-    events: [],
+    events: ['cud'],
   })
   // Initialize hooks
   app.service(itemPath).hooks({
@@ -54,7 +54,9 @@ export const items = (app: Application) => {
     },
     after: {
       all: [],
-      remove: [clearAfterRemove],
+      create: [emitCUD],
+      patch: [emitCUD],
+      remove: [emitCUD, clearAfterRemove],
     },
     error: {
       all: [],

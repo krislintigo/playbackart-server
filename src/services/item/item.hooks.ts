@@ -78,3 +78,8 @@ export const $sort = async (ctx: HookContext) => {
   ])
   ctx.result = { data, limit, skip, total }
 }
+
+export const emitCUD = (context: HookContext) => {
+  context.event = null
+  context.service.emit('cud', context.result)
+}
