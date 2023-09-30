@@ -93,14 +93,14 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       query: {
         ...(type && { type }),
         userId,
-        // name: 'Аврора',
+        // name: 'Игра престолов',
       },
       paginate: false,
     })
 
     const computeDuration = (
       item: Item,
-      { full = false, includeParts = true }: { full?: boolean; includeParts?: boolean },
+      { full = false, includeParts = false }: { full?: boolean; includeParts?: boolean },
     ) => {
       const part = (i: Item['time']) => (full ? i.replays + 1 : 1) * i.count * i.duration
 
@@ -169,6 +169,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
         const currentGenre =
           genresMap.get(genre) ?? genresMap.set(genre, cloneDeep(DEFAULT_EXTENDED_STATISTICS)).get(genre)
         if (currentGenre) {
+          currentGenre.count++
           for (const part of fullParts) {
             const rating = part.rating || item.rating
             if (!rating) continue
@@ -187,9 +188,13 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
           developersMap.get(developer) ??
           developersMap.set(developer, cloneDeep(DEFAULT_EXTENDED_STATISTICS)).get(developer)
         if (currentDeveloper) {
+          currentDeveloper.count++
           for (const part of fullParts) {
             const rating = part.rating || item.rating
-            if (!rating || !part.developers.includes(developer)) continue
+            const partIncludesDeveloper = item.config.parts.multipleDevelopers
+              ? part.developers.includes(developer)
+              : true
+            if (!rating || !partIncludesDeveloper) continue
             currentDeveloper.items.push({
               rating,
               duration: computeDuration(part, {}),
@@ -205,6 +210,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
           franchisesMap.get(franchise) ??
           franchisesMap.set(franchise, cloneDeep(DEFAULT_EXTENDED_STATISTICS)).get(franchise)
         if (currentFranchise) {
+          currentFranchise.count++
           for (const part of fullParts) {
             const rating = part.rating || item.rating
             if (!rating) continue
@@ -226,7 +232,18 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
           currentStatus.fullDuration += computeDuration(part, { full: true, includeParts: false })
         }
       }
+      const mainStatus = totalMap.get(item.status)
+      if (mainStatus) mainStatus.count++
     }
+
+    // const computeCoefficients_map = (map: Map<string, Omit<ExtendedStatistic<string>, 'value'>>) => {
+    //   map.forEach((item) => {
+    //     item.coefficient =
+    //       item.items
+    //         .map((i) => i.fullDuration * ratingCoefficient(i.rating))
+    //         .reduce((acc, cur) => acc + cur, 0) / totalDuration
+    //   })
+    // }
 
     const ratings = [...ratingsMap.entries()].map(([value, data]) => ({ value, ...data }))
     const restrictions = [...restrictionsMap.entries()].map(([value, data]) => ({ value, ...data }))
@@ -235,25 +252,21 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
     const franchises = [...franchisesMap.entries()].map(([value, data]) => ({ value, ...data }))
     const total = [...totalMap.entries()].map(([status, data]) => ({ status, ...data }))
 
+    const computeCoefficients = (items: Array<ExtendedStatistic<string>>) => {
+      for (const item of items) {
+        item.coefficient =
+          item.items
+            .map((i) => i.fullDuration * ratingCoefficient(i.rating))
+            .reduce((acc, cur) => acc + cur, 0) / totalDuration
+      }
+    }
+
     const totalDuration = total.reduce((acc, cur) => acc + cur.duration, 0)
-    for (const genre of genres) {
-      genre.coefficient =
-        genre.items
-          .map((i) => i.fullDuration * ratingCoefficient(i.rating))
-          .reduce((acc, cur) => acc + cur, 0) / totalDuration
-    }
-    for (const developer of developers) {
-      developer.coefficient =
-        developer.items
-          .map((i) => i.fullDuration * ratingCoefficient(i.rating))
-          .reduce((acc, cur) => acc + cur, 0) / totalDuration
-    }
-    for (const franchise of franchises) {
-      franchise.coefficient =
-        franchise.items
-          .map((i) => i.fullDuration * ratingCoefficient(i.rating))
-          .reduce((acc, cur) => acc + cur, 0) / totalDuration
-    }
+    computeCoefficients(genres)
+    computeCoefficients(developers)
+    computeCoefficients(franchises)
+
+    // console.log(franchises[0].items)
 
     return { ratings, restrictions, genres, developers, franchises, total }
   }
