@@ -43,7 +43,7 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
       },
       endpoint: process.env.S3_ENDPOINT,
       forcePathStyle: true,
-      region: process.env.S3_REGION,
+      // region: process.env.S3_REGION,
       apiVersion: 'latest',
     })
     this.bucket = process.env.S3_BUCKET as string
