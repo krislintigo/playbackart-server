@@ -55,7 +55,7 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
       Bucket: this.bucket,
       Key: id,
     })
-    console.log(id, this.bucket)
+    console.log('getting', id)
     const result = await this.s3Client.send(getCommand)
     console.log(result)
     const headers = {
