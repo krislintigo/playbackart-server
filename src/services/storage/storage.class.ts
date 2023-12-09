@@ -43,7 +43,7 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
       },
       endpoint: process.env.S3_ENDPOINT,
       forcePathStyle: true,
-      // region: process.env.S3_REGION,
+      region: process.env.S3_REGION,
       apiVersion: 'latest',
     })
     this.bucket = process.env.S3_BUCKET as string
@@ -51,8 +51,6 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
 
   async get(id: string, _params?: ServiceParams): Promise<Storage> {
     // Create the getCommand
-    const res = await fetch('https://jsonplaceholder.typicode.com/todos/2')
-    console.log(await res.json())
     const getCommand = new GetObjectCommand({
       Bucket: this.bucket,
       Key: id,
