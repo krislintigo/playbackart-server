@@ -65,9 +65,11 @@ app.use(async (ctx) => {
   // S3 middleware
   if (ctx.request.url.startsWith('/objects')) {
     try {
+      console.log('get file start')
       const { file, headers, status } = await app
         .service('storage')
         .get(ctx.request.url.replace('/objects/', ''))
+      console.log('get file - done')
       ctx.response.set(headers)
       ctx.response.status = status
       ctx.body = file
