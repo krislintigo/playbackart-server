@@ -7,6 +7,7 @@ import {
   DeleteObjectsCommand,
   GetObjectCommand,
   ListObjectsV2Command,
+  type ListObjectsV2CommandInput,
   type PutObjectAclCommandOutput,
   PutObjectCommand,
   S3Client,
@@ -94,10 +95,10 @@ export class StorageService<ServiceParams extends StorageParams = StorageParams>
     return await this.s3Client.send(command)
   }
 
-  async find({ Prefix }: { Prefix: string }, _params?: ServiceParams) {
+  async find(options: Omit<ListObjectsV2CommandInput, 'Bucket'>, _params?: ServiceParams) {
     const listCommand = new ListObjectsV2Command({
       Bucket: this.bucket,
-      Prefix,
+      ...options,
     })
     return await this.s3Client.send(listCommand)
   }

@@ -14,8 +14,10 @@
   },
   "include": [
     "src",
+    "api"
   ],
   "exclude": [
     "test",
+    "api"
   ]
 }
