@@ -18,8 +18,11 @@ import type { Application } from '../../declarations'
 import { ItemService, getOptions } from './item.class'
 import { itemPath, itemMethods } from './item.shared'
 import { authorize } from 'feathers-casl'
-import { clearAfterPatch, clearAfterRemove, postersUpload } from '../../resolvers/files'
-import { $sort, emitCUD } from './item.hooks'
+import { clearAfterRemove, postersUpload } from '../../resolvers/files'
+import { emitCUD } from './item.hooks'
+import { ratingSortPipeline, timeSortPipeline } from './item.sort'
+import { $sort } from '../../hooks/sort'
+import { $pipeline } from '../../hooks/pipeline'
 
 export * from './item.class'
 export * from './item.schema'
@@ -36,18 +39,26 @@ export const items = (app: Application) => {
   // Initialize hooks
   app.service(itemPath).hooks({
     around: {
-      all: [schemaHooks.resolveExternal(itemExternalResolver), schemaHooks.resolveResult(itemResolver)],
+      all: [
+        schemaHooks.resolveExternal(itemExternalResolver),
+        schemaHooks.resolveResult(itemResolver),
+        // schemaHooks.validateQuery(itemQueryValidator),
+        schemaHooks.resolveQuery(itemQueryResolver),
+      ],
+      find: [],
       create: [postersUpload, authenticate('jwt'), authorize()],
       patch: [postersUpload, authenticate('jwt'), authorize()],
       remove: [authenticate('jwt'), authorize()],
     },
     before: {
-      all: [
-        // schemaHooks.validateQuery(itemQueryValidator),
-        schemaHooks.resolveQuery(itemQueryResolver),
+      all: [],
+      find: [
+        $sort({
+          time: timeSortPipeline,
+          rating: ratingSortPipeline,
+        }),
+        $pipeline(),
       ],
-      find: [$sort],
-      get: [],
       create: [schemaHooks.validateData(itemDataValidator), schemaHooks.resolveData(itemDataResolver)],
       patch: [schemaHooks.validateData(itemPatchValidator), schemaHooks.resolveData(itemPatchResolver)],
       remove: [],
