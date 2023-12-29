@@ -18,6 +18,7 @@ import type { Application } from '../../declarations'
 import { UserService, getOptions } from './user.class'
 import { userPath, userMethods } from './user.shared'
 import { authorize } from 'feathers-casl'
+import { set } from 'lodash'
 
 export * from './user.class'
 export * from './user.schema'

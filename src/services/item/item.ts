@@ -34,7 +34,7 @@ export const items = (app: Application) => {
     // A list of all methods this service exposes externally
     methods: itemMethods,
     // You can add additional custom events to be sent to clients here
-    events: ['cud'],
+    events: ['cud', 'test'],
   })
   // Initialize hooks
   app.service(itemPath).hooks({
@@ -73,6 +73,12 @@ export const items = (app: Application) => {
       all: [],
     },
   })
+  // setInterval(() => {
+  //   app.service('items').emit('test', { test: 'test' })
+  // }, 2000)
+  // app.service('items').on('test', (data) => {
+  //   console.log(data)
+  // })
 }
 
 // Add this service to the service type index
