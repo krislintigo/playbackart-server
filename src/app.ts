@@ -38,10 +38,10 @@ app.configure(
   }),
 )
 app.configure(feathersCasl({ defaultAdapter: '@feathersjs/mongodb' }))
-app.configure(channels)
 app.configure(mongodb)
 app.configure(authentication)
 app.configure(services)
+app.configure(channels)
 
 // Register hooks that run on all service methods
 app.hooks({
