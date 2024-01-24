@@ -2,23 +2,33 @@ import { type HookContext } from '@feathersjs/feathers'
 
 export const $pipeline = () => async (ctx: HookContext) => {
   if (!ctx.params.customPipeline) return
-  console.log(ctx.params.pipeline, ctx.params.query)
 
   const {
     filters: { $limit: limit, $skip: skip },
-    query,
   } = ctx.service.filterQuery(null, ctx.params)
 
-  const [data, total] = await Promise.all([
-    ctx.service._find({
-      pipeline: ctx.params.pipeline,
-      paginate: false,
-    }),
-    (async () => {
-      const model = await ctx.service.getModel()
-      return model.countDocuments(query)
-    })(),
-  ])
+  const pipeline = [
+    ...ctx.params.pipeline,
+    {
+      $facet: {
+        data: [{ $skip: skip }, ...(limit ? [{ $limit: limit }] : [])],
+        total: [{ $count: 'count' }],
+      },
+    },
+    {
+      $project: {
+        data: 1,
+        total: { $arrayElemAt: ['$total.count', 0] },
+      },
+    },
+  ]
+  console.log('pipeline', pipeline)
+  const result = await ctx.service._find({
+    pipeline,
+    paginate: false,
+  })
+  const { data, total } = result[0]
+  console.log(total)
 
   ctx.result = { data, limit, skip, total }
 }

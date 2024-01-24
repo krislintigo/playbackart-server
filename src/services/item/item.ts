@@ -73,12 +73,6 @@ export const items = (app: Application) => {
       all: [],
     },
   })
-  // setInterval(() => {
-  //   app.service('items').emit('test', { test: 'test' })
-  // }, 2000)
-  // app.service('items').on('test', (data) => {
-  //   console.log(data)
-  // })
 }
 
 // Add this service to the service type index

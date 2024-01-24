@@ -1,4 +1,6 @@
-export const timeSortPipeline = (sortOrder: 1 | -1) => [
+import { type Document } from 'mongodb'
+
+export const timeSortPipeline = (sortOrder: 1 | -1): Document[] => [
   {
     $addFields: {
       calculatedTime: {
@@ -21,7 +23,7 @@ export const timeSortPipeline = (sortOrder: 1 | -1) => [
   { $project: { calculatedTime: 0 } },
 ]
 
-export const ratingSortPipeline = (sortOrder: 1 | -1) => [
+export const ratingSortPipeline = (sortOrder: 1 | -1): Document[] => [
   {
     $addFields: {
       calculatedRating: {
