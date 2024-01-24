@@ -225,8 +225,10 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
         const currentStatus =
           totalMap.get(status) ?? totalMap.set(status, cloneDeep(DEFAULT_TOTAL_STATISTICS)).get(status)
         if (currentStatus) {
-          currentStatus.duration += computeDuration(part)
-          currentStatus.fullDuration += computeDuration(part, true)
+          if (status === item.status) {
+            currentStatus.duration += computeDuration(part)
+            currentStatus.fullDuration += computeDuration(part, true)
+          }
         }
       }
       const mainStatus = totalMap.get(item.status)
