@@ -4,14 +4,24 @@ export const timeSortPipeline = (sortOrder: 1 | -1): Document[] => [
   {
     $addFields: {
       calculatedTime: {
-        $add: [
-          { $multiply: ['$time.count', '$time.duration'] },
+        $sum: [
           {
-            $sum: {
-              $map: {
-                input: '$parts',
-                as: 'part',
-                in: { $multiply: ['$$part.time.count', '$$part.time.duration'] },
+            $add: [{ $multiply: ['$time.count', '$time.duration'] }, { $sum: '$time.sessions.duration' }],
+          },
+          {
+            $reduce: {
+              input: '$parts',
+              initialValue: 0,
+              in: {
+                $add: [
+                  '$$value',
+                  {
+                    $add: [
+                      { $multiply: ['$$this.time.count', '$$this.time.duration'] },
+                      { $sum: '$$this.time.sessions.duration' },
+                    ],
+                  },
+                ],
               },
             },
           },
@@ -29,7 +39,6 @@ export const ratingSortPipeline = (sortOrder: 1 | -1): Document[] => [
       calculatedRating: {
         $cond: {
           if: '$config.parts.multipleRatings',
-          // then: { $avg: '$parts.rating' },
           then: { $floor: { $add: [{ $avg: '$parts.rating' }, 0.5] } },
           else: '$rating',
         },

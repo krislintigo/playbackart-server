@@ -48,7 +48,6 @@ export const itemSchema = Type.Object(
 
     config: Type.Object(config),
 
-    // status: StringEnum(['in-process', 'planned', 'completed', 'postponed', 'abandoned']),
     type: StringEnum(['movie', 'series', 'game', 'book']),
     restriction: StringEnum(['', 'G', 'PG', 'PG-13', 'R', 'NC-17']),
     genres: Type.Array(Type.String()),
@@ -61,7 +60,11 @@ export const itemSchema = Type.Object(
   },
   { $id: 'Item', additionalProperties: false },
 )
+const itemPartSchema = Type.Object(sharedData)
+
 export type Item = Static<typeof itemSchema>
+export type Part = Static<typeof itemPartSchema>
+
 export const itemValidator = getValidator(itemSchema, dataValidator)
 export const itemResolver = resolve<Item, HookContext>({})
 

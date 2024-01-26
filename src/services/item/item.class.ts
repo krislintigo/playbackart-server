@@ -3,7 +3,7 @@ import type { Params } from '@feathersjs/feathers'
 import { MongoDBService } from '@feathersjs/mongodb'
 import type { MongoDBAdapterParams, MongoDBAdapterOptions } from '@feathersjs/mongodb'
 import type { Application } from '../../declarations'
-import { type Item, type ItemData, type ItemPatch, type ItemQuery } from './item.schema'
+import { type Item, type ItemData, type ItemPatch, type ItemQuery, type Part } from './item.schema'
 import { cloneDeep, omit } from 'lodash'
 export type { Item, ItemData, ItemPatch, ItemQuery }
 
@@ -60,9 +60,9 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       paginate: false,
     })
 
-    const computeDuration = (item: Item, full = false) => {
-      return (full ? item.time.replays + 1 : 1) * item.time.count * item.time.duration
-    }
+    const computeDuration = (p: Part, full = false) =>
+      (full ? p.time.replays + 1 : 1) * p.time.count * p.time.duration +
+      p.time.sessions.reduce((acc, cur) => acc + cur.duration, 0)
 
     const ratingCoefficient = (rating: number) => {
       switch (rating) {
@@ -100,7 +100,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
     const totalMap = new Map<Item['status'] | 'all', Omit<TotalStatistic, 'status'>>()
 
     for (const item of items) {
-      const fullParts = [item, ...item.parts] as Item[]
+      const fullParts = [item, ...item.parts]
       // ratings
       const ratings = [...new Set(fullParts.map((part) => part.rating).filter(Boolean))]
       for (const rating of ratings) {

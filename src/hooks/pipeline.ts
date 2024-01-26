@@ -22,13 +22,11 @@ export const $pipeline = () => async (ctx: HookContext) => {
       },
     },
   ]
-  console.log('pipeline', pipeline)
   const result = await ctx.service._find({
     pipeline,
     paginate: false,
   })
   const { data, total } = result[0]
-  console.log(total)
 
   ctx.result = { data, limit, skip, total }
 }
