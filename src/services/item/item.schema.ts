@@ -15,10 +15,9 @@ const config = {
     multipleRatings: Type.Boolean(),
     multipleDevelopers: Type.Boolean(),
   }),
-  // later
-  // time: Type.Object({
-  //   extended: Type.Boolean(),
-  // }),
+  time: Type.Object({
+    extended: Type.Boolean(),
+  }),
 }
 
 const sharedData = {
@@ -29,6 +28,12 @@ const sharedData = {
     count: Type.Number({ minimum: 1 }),
     duration: Type.Number({ minimum: 0 }),
     replays: Type.Number({ minimum: 0 }),
+    sessions: Type.Array(
+      Type.Object({
+        name: Type.String(),
+        duration: Type.Number({ minimum: 0 }),
+      }),
+    ),
   }),
   year: Type.String(),
   developers: Type.Array(Type.String()),
