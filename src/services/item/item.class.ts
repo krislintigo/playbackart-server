@@ -24,7 +24,7 @@ interface ExtendedStatisticInput<T> extends SimpleStatistic<T> {
 export type ExtendedStatistic<T> = Omit<ExtendedStatisticInput<T>, 'items'>
 
 export interface TotalStatistic {
-  status: Item['status']
+  status: Item['status'] | 'all'
   count: number
   duration: number
   fullDuration: number
@@ -95,7 +95,6 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       query: {
         ...(type && { type }),
         userId,
-        // name: 'Игра престолов',
       },
       paginate: false,
     })
@@ -137,7 +136,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
     const genresMap = new Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>()
     const developersMap = new Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>()
     const franchisesMap = new Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>()
-    const totalMap = new Map<Item['status'], Omit<TotalStatistic, 'status'>>()
+    const totalMap = new Map<Item['status'] | 'all', Omit<TotalStatistic, 'status'>>()
 
     for (const item of items) {
       const fullParts = [item, ...item.parts] as Item[]
@@ -220,6 +219,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
         }
       }
       // total
+      const total = totalMap.get('all') ?? totalMap.set('all', cloneDeep(DEFAULT_TOTAL_STATISTICS)).get('all')
       for (const part of fullParts) {
         const status = part.status
         const currentStatus =
@@ -230,9 +230,14 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
             currentStatus.fullDuration += computeDuration(part, true)
           }
         }
+        if (total) {
+          total.duration += computeDuration(part)
+          total.fullDuration += computeDuration(part, true)
+        }
       }
       const mainStatus = totalMap.get(item.status)
       if (mainStatus) mainStatus.count++
+      if (total) total.count++
     }
 
     const totalDuration = [...totalMap.values()].reduce((acc, cur) => acc + cur.duration, 0)
