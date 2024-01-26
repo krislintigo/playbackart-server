@@ -48,45 +48,6 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
   ItemParams,
   ItemPatch
 > {
-  // async filters_old(
-  //   { userId, type }: { userId: string | undefined; type?: Item['type'] },
-  //   _params?: ServiceParams,
-  // ): Promise<FiltersOutput> {
-  //   if (!userId) throw new Error('No userId provided')
-  //
-  //   const result = (await this.find({
-  //     query: {
-  //       ...(type && { type }),
-  //       userId,
-  //     },
-  //     pipeline: [
-  //       {
-  //         $facet: {
-  //           ratings: ratingsAggregation,
-  //           restrictions: restrictionsAggregation,
-  //           genres: genresAggregation,
-  //           developers: developersAggregation,
-  //           franchises: franchisesAggregation,
-  //           total: totalAggregation,
-  //         },
-  //       },
-  //       {
-  //         $project: {
-  //           _id: 0,
-  //           ratings: 1,
-  //           restrictions: 1,
-  //           genres: 1,
-  //           developers: 1,
-  //           franchises: 1,
-  //           total: 1,
-  //         },
-  //       },
-  //     ],
-  //     paginate: false,
-  //   })) as any
-  //   return result.at(0)
-  // }
-
   async filters(
     { userId, type }: { userId: string | undefined; type?: Item['type'] },
     _params?: ServiceParams,
