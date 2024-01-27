@@ -34,6 +34,7 @@ export interface FiltersOutput {
   ratings: Array<SimpleStatistic<number>>
   restrictions: Array<SimpleStatistic<Item['restriction']>>
   genres: Array<ExtendedStatistic<string>>
+  categories: Array<ExtendedStatistic<string>>
   developers: Array<ExtendedStatistic<string>>
   franchises: Array<ExtendedStatistic<string>>
   total: TotalStatistic[]
@@ -95,13 +96,14 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       Omit<SimpleStatistic<Item['restriction']>, 'value'>
     >()
     const genresMap = new Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>()
+    const categoriesMap = new Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>()
     const developersMap = new Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>()
     const franchisesMap = new Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>()
     const totalMap = new Map<Item['status'] | 'all', Omit<TotalStatistic, 'status'>>()
 
     for (const item of items) {
       const fullParts = [item, ...item.parts]
-      // ratings
+      // RATINGS
       const ratings = [...new Set(fullParts.map((part) => part.rating).filter(Boolean))]
       for (const rating of ratings) {
         const currentRating =
@@ -110,7 +112,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
           currentRating.count++
         }
       }
-      // restrictions
+      // RESTRICTIONS
       const restriction = item.restriction
       if (restriction) {
         const currentRestriction =
@@ -120,7 +122,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
           currentRestriction.count++
         }
       }
-      // genres
+      // GENRES
       const genres = item.genres
       for (const genre of genres) {
         const currentGenre =
@@ -138,7 +140,26 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
           }
         }
       }
-      // developers
+      // CATEGORIES
+      const categories = item.categories
+      for (const category of categories) {
+        const currentCategory =
+          categoriesMap.get(category) ??
+          categoriesMap.set(category, cloneDeep(DEFAULT_EXTENDED_STATISTICS)).get(category)
+        if (currentCategory) {
+          currentCategory.count++
+          for (const part of fullParts) {
+            const rating = part.rating || item.rating
+            if (!rating) continue
+            currentCategory.items.push({
+              rating,
+              duration: computeDuration(part),
+              fullDuration: computeDuration(part, true),
+            })
+          }
+        }
+      }
+      // DEVELOPERS
       const developers = [...new Set(fullParts.map((part) => part.developers).flat(1))]
       for (const developer of developers) {
         const currentDeveloper =
@@ -160,7 +181,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
           }
         }
       }
-      // franchises
+      // FRANCHISES
       const franchise = item.franchise // also use franchise for huge elements? (Тьма)
       if (franchise) {
         const currentFranchise =
@@ -179,7 +200,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
           }
         }
       }
-      // total
+      // TOTAL
       const total = totalMap.get('all') ?? totalMap.set('all', cloneDeep(DEFAULT_TOTAL_STATISTICS)).get('all')
       for (const part of fullParts) {
         const status = part.status
@@ -201,7 +222,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       if (total) total.count++
     }
 
-    const totalDuration = [...totalMap.values()].reduce((acc, cur) => acc + cur.duration, 0)
+    const totalDuration = totalMap.get('all')!.duration
     const computeCoefficients = (map: Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>) => {
       map.forEach((item) => {
         item.coefficient =
@@ -212,12 +233,17 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
     }
 
     computeCoefficients(genresMap)
+    computeCoefficients(categoriesMap)
     computeCoefficients(developersMap)
     computeCoefficients(franchisesMap)
 
     const ratings = [...ratingsMap.entries()].map(([value, data]) => ({ value, ...data }))
     const restrictions = [...restrictionsMap.entries()].map(([value, data]) => ({ value, ...data }))
     const genres = [...genresMap.entries()].map(([value, data]) => ({ value, ...omit(data, 'items') }))
+    const categories = [...categoriesMap.entries()].map(([value, data]) => ({
+      value,
+      ...omit(data, 'items'),
+    }))
     const developers = [...developersMap.entries()].map(([value, data]) => ({
       value,
       ...omit(data, 'items'),
@@ -228,7 +254,7 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
     }))
     const total = [...totalMap.entries()].map(([status, data]) => ({ status, ...data }))
 
-    return { ratings, restrictions, genres, developers, franchises, total }
+    return { ratings, restrictions, genres, categories, developers, franchises, total }
   }
 }
 

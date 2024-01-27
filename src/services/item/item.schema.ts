@@ -52,6 +52,7 @@ export const itemSchema = Type.Object(
     restriction: StringEnum(['', 'G', 'PG', 'PG-13', 'R', 'NC-17']),
     genres: Type.Array(Type.String()),
     franchise: Type.String(),
+    categories: Type.Array(Type.String()),
     parts: Type.Array(Type.Object(sharedData)),
 
     ...sharedData,
