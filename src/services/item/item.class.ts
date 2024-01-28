@@ -100,6 +100,12 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
     const developersMap = new Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>()
     const franchisesMap = new Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>()
     const totalMap = new Map<Item['status'] | 'all', Omit<TotalStatistic, 'status'>>()
+    const durations = {
+      genres: 0,
+      categories: 0,
+      developers: 0,
+      franchises: 0,
+    }
 
     for (const item of items) {
       const fullParts = [item, ...item.parts]
@@ -140,6 +146,11 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
           }
         }
       }
+      if (genres.length) {
+        for (const part of fullParts) {
+          durations.genres += computeDuration(part)
+        }
+      }
       // CATEGORIES
       const categories = item.categories
       for (const category of categories) {
@@ -157,6 +168,11 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
               fullDuration: computeDuration(part, true),
             })
           }
+        }
+      }
+      if (categories.length) {
+        for (const part of fullParts) {
+          durations.categories += computeDuration(part)
         }
       }
       // DEVELOPERS
@@ -181,6 +197,11 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
           }
         }
       }
+      if (developers.length) {
+        for (const part of fullParts) {
+          durations.developers += computeDuration(part)
+        }
+      }
       // FRANCHISES
       const franchise = item.franchise // also use franchise for huge elements? (Тьма)
       if (franchise) {
@@ -198,6 +219,11 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
               fullDuration: computeDuration(part, true),
             })
           }
+        }
+      }
+      if (franchise) {
+        for (const part of fullParts) {
+          durations.franchises += computeDuration(part)
         }
       }
       // TOTAL
@@ -222,20 +248,25 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       if (total) total.count++
     }
 
-    const totalDuration = totalMap.get('all')!.duration
-    const computeCoefficients = (map: Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>) => {
+    // const totalDuration = totalMap.get('all')!.duration
+    // console.log(totalDuration, durations)
+    const computeCoefficients = (
+      map: Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>,
+      total: number,
+    ) => {
       map.forEach((item) => {
         item.coefficient =
           item.items
             .map((i) => i.fullDuration * ratingCoefficient(i.rating))
-            .reduce((acc, cur) => acc + cur, 0) / totalDuration
+            .reduce((acc, cur) => acc + cur, 0) / total
       })
     }
 
-    computeCoefficients(genresMap)
-    computeCoefficients(categoriesMap)
-    computeCoefficients(developersMap)
-    computeCoefficients(franchisesMap)
+    computeCoefficients(genresMap, durations.genres)
+    computeCoefficients(categoriesMap, durations.categories)
+    computeCoefficients(developersMap, durations.developers)
+    computeCoefficients(franchisesMap, durations.franchises)
+    console.log(categoriesMap)
 
     const ratings = [...ratingsMap.entries()].map(([value, data]) => ({ value, ...data }))
     const restrictions = [...restrictionsMap.entries()].map(([value, data]) => ({ value, ...data }))
