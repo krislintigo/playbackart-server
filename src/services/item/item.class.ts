@@ -248,8 +248,6 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
       if (total) total.count++
     }
 
-    // const totalDuration = totalMap.get('all')!.duration
-    // console.log(totalDuration, durations)
     const computeCoefficients = (
       map: Map<string, Omit<ExtendedStatisticInput<string>, 'value'>>,
       total: number,
@@ -266,7 +264,6 @@ export class ItemService<ServiceParams extends Params = ItemParams> extends Mong
     computeCoefficients(categoriesMap, durations.categories)
     computeCoefficients(developersMap, durations.developers)
     computeCoefficients(franchisesMap, durations.franchises)
-    console.log(categoriesMap)
 
     const ratings = [...ratingsMap.entries()].map(([value, data]) => ({ value, ...data }))
     const restrictions = [...restrictionsMap.entries()].map(([value, data]) => ({ value, ...data }))
