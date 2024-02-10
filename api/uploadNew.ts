@@ -6,7 +6,6 @@ import { hideBin } from 'yargs/helpers'
 import { omit } from 'lodash'
 
 const argv = yargs(hideBin(process.argv)).argv as unknown as { userId: string }
-if (!argv.userId) throw new Error('Pass userId to command line!')
 
 async function main() {
   const data = await fs.readFile('./api/result.json', 'utf8')
