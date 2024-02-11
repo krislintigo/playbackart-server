@@ -1,6 +1,5 @@
-import { getRestriction, getType } from './helpers'
+import { getRestriction, getType, getGenre } from './helpers'
 import * as fs from 'fs'
-import { capitalize } from 'lodash'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
@@ -25,27 +24,52 @@ async function main() {
     })
     const film: any = await response.json()
     console.log(id, ':', film?.nameRu)
+    const poster = await fetch(film.posterUrlPreview)
+      .then(async (response) => await response.arrayBuffer())
+      .then((buffer) => 'data:image/jpeg;base64,' + Buffer.from(buffer).toString('base64'))
     return {
+      config: {
+        parts: {
+          extended: false,
+          multiplePosters: false,
+          multipleRatings: false,
+          multipleDevelopers: false,
+        },
+        time: {
+          extended: false,
+        },
+      },
       name: film.nameRu,
-      poster: film.posterUrlPreview || '',
+      poster: {
+        name: film.nameRu,
+        key: '',
+        uploadedAt: '',
+        buffer: poster,
+      },
       rating: 0,
       status: 'postponed',
       type: getType(film.type),
       restriction: getRestriction(film.ratingMpaa),
-      genres: ['TEMPLATE'].concat(film.genres.map(({ genre }: { genre: string }) => capitalize(genre))),
+      genres: [
+        ...new Set(
+          film.genres.map(({ genre }: { genre: string }) => getGenre(genre)).filter((genre: string) => genre),
+        ),
+      ],
+      categories: ['TEMPLATE'],
       time: {
         count: 1,
         duration: film.filmLength,
         replays: 0,
+        sessions: [],
       },
       year: film.year.toString() || '',
       developers: [],
       franchise: '',
+      parts: [],
     }
   })
 
   const response = await Promise.all(mapped)
-  console.log(response)
   fs.writeFileSync('./api/result.json', JSON.stringify(response))
 }
 

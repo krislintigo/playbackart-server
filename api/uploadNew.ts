@@ -15,7 +15,10 @@ async function main() {
     userId: item.userId || argv.userId,
   }))
   console.log(creations.length)
-  await app.service('items').create(creations)
+  const promises = creations.map(async (creation: any) => {
+    await app.service('items').create(creation)
+  })
+  await Promise.all(promises)
   process.exit(0)
 }
 

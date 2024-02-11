@@ -35,8 +35,8 @@ export const postersUpload = async (ctx: HookContext, next: NextFunction) => {
   const uploads = files
     .filter(({ file }) => file.buffer)
     .map(({ file, path }) => {
-      const buffer = Buffer.from((file.buffer as string).replace(/^data:[\w/.+-]+;base64,/, ''), 'base64')
-      const type = getMimeType(file.buffer as string)
+      const buffer = Buffer.from(file.buffer!.replace(/^data:[\w/.+-]+;base64,/, ''), 'base64')
+      const type = getMimeType(file.buffer!)
       return {
         instanceKey: uuid() + '_' + file.name.replace(/\s+/g, '_').replace(/[^\w\s.]/gi, ''),
         path,
@@ -72,14 +72,16 @@ export const postersUpload = async (ctx: HookContext, next: NextFunction) => {
       const afterFile = get(ctx.result, file.path)
       afterFile.key = Key
       afterFile.uploadedAt = uploadedAt
-      await ctx.app.service('storage').create({
-        Key,
-        Body: file.buffer,
-        ContentType: file.type,
-      })
-      void ctx.service._patch(ctx.result._id, {
-        $set: { [`${file.path}.key`]: Key, [`${file.path}.uploadedAt`]: uploadedAt },
-      })
+      await Promise.all([
+        ctx.app.service('storage').create({
+          Key,
+          Body: file.buffer,
+          ContentType: file.type,
+        }),
+        ctx.service._patch(ctx.result._id, {
+          $set: { [`${file.path}.key`]: Key, [`${file.path}.uploadedAt`]: uploadedAt },
+        }),
+      ])
     }),
   )
 
@@ -125,5 +127,5 @@ export const clearAfterRemove = async (ctx: HookContext) => {
     .service('storage')
     .find({ Prefix: `${service}/${instanceId}` })
   if (!removables?.length) return
-  await ctx.app.service('storage').remove(removables.map((i) => i.Key as string))
+  await ctx.app.service('storage').remove(removables.map((i) => i.Key!))
 }
